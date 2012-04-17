@@ -1,0 +1,1 @@
+mvn assembly:assembly
