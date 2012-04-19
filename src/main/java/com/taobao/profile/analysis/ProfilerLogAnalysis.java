@@ -41,13 +41,14 @@ public class ProfilerLogAnalysis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-        if (args.length != 3) {
-            System.err.println("Usage: <tprofiler.log path> <tmethod.log path> <profilerresult.log path>");
-            return;
-        }
+		if (args.length != 4) {
+			System.err
+					.println("Usage: <tprofiler.log path> <tmethod.log path> <topmethod.log path> <topobject.log path>");
+			return;
+		}
 		ProfilerLogAnalysis analysis = new ProfilerLogAnalysis(args[0], args[1]);
 		analysis.reader();
-		analysis.printResult(args[2]);
+		analysis.printResult(args[2], args[3]);
 	}
 
 	/**
@@ -108,7 +109,7 @@ public class ProfilerLogAnalysis {
 					continue;
 				}
 				merge(Long.parseLong(data[0]), Long.parseLong(data[1]), Long.parseLong(data[2]),
-				        Long.parseLong(data[3]));
+						Long.parseLong(data[3]));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -186,14 +187,16 @@ public class ProfilerLogAnalysis {
 	/**
 	 * 输出分析结果
 	 */
-	public void printResult(String outPath) {
+	public void printResult(String topMethodPath, String topObjectPath) {
 		List<TimeSortData> list = new ArrayList<TimeSortData>();
 		list.addAll(cacheMethodMap.values());
 		Collections.sort(list);
 
-		BufferedWriter writer = null;
+		BufferedWriter topMethodWriter = null;
+		BufferedWriter topObjectWriter = null;
 		try {
-			writer = new BufferedWriter(new FileWriter(outPath));
+			topMethodWriter = new BufferedWriter(new FileWriter(topMethodPath));
+			topObjectWriter = new BufferedWriter(new FileWriter(topObjectPath));
 			for (TimeSortData data : list) {
 				StringBuilder sb = new StringBuilder();
 				Stack<Long> stack = data.valueStack;
@@ -214,15 +217,26 @@ public class ProfilerLogAnalysis {
 				sb.append("\t");
 				sb.append(allTime);
 				sb.append("\n");
-				writer.write(sb.toString());
+				topMethodWriter.write(sb.toString());
+				if (data.methodName != null && data.methodName.contains("<init>")) {
+					topObjectWriter.write(sb.toString());
+				}
 			}
-			writer.flush();
+			topMethodWriter.flush();
+			topObjectWriter.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (writer != null) {
+			if (topMethodWriter != null) {
 				try {
-					writer.close();
+					topMethodWriter.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (topObjectWriter != null) {
+				try {
+					topObjectWriter.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
