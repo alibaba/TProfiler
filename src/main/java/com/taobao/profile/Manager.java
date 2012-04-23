@@ -28,10 +28,6 @@ public class Manager {
 	 * 默认配置文件
 	 */
 	private static final String DEFAULT_CONFIG = "profile";
-	/**
-	 * 用户自定义配置文件路径
-	 */
-	private static final String CUSTOM_CONFIG = "/home/admin/tprofiler/profile.properties";
 
 	/**
 	 * 远程连接端口
@@ -111,7 +107,7 @@ public class Manager {
 	 * 私有构造器
 	 */
 	private Manager() {
-		profConfig = new ProfConfig(CUSTOM_CONFIG, DEFAULT_CONFIG);
+		profConfig = new ProfConfig(DEFAULT_CONFIG);
 		NEED_NANO_TIME = profConfig.isNeedNanoTime();
 		IGNORE_GETSET_METHOD = profConfig.isIgnoreGetSetMethod();
 		METHOD_LOG_PATH = profConfig.getMethodFilePath();

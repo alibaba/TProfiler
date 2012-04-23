@@ -67,7 +67,7 @@ public class ProfConfig {
 	 * 两次profile间隔时间
 	 */
 	private int eachProfIntervalTime = -1;
-	
+
 	/**
 	 * 两次sampler间隔时间
 	 */
@@ -86,12 +86,17 @@ public class ProfConfig {
 	/**
 	 * 构造方法
 	 */
-	public ProfConfig(String customPath, String defaultPath) {
-		File file = new File(customPath);
-		if (file.exists()) {
-			parseProperty(file);
-		} else {
+	public ProfConfig(String defaultPath) {
+		String configPath = System.getProperty("profile.properties");
+		if (configPath == null || configPath.isEmpty()) {
 			parse(defaultPath);
+		} else {
+			File file = new File(configPath);
+			if (file.exists()) {
+				parseProperty(file);
+			} else {
+				parse(defaultPath);
+			}
 		}
 	}
 
@@ -339,31 +344,33 @@ public class ProfConfig {
 	}
 
 	/**
-     * @param samplerFilePath the samplerFilePath to set
-     */
-    public void setSamplerFilePath(String samplerFilePath) {
-    	this.samplerFilePath = samplerFilePath;
-    }
+	 * @param samplerFilePath
+	 *            the samplerFilePath to set
+	 */
+	public void setSamplerFilePath(String samplerFilePath) {
+		this.samplerFilePath = samplerFilePath;
+	}
 
 	/**
-     * @param samplerIntervalTime the samplerIntervalTime to set
-     */
-    public void setSamplerIntervalTime(int samplerIntervalTime) {
-    	this.samplerIntervalTime = samplerIntervalTime;
-    }
+	 * @param samplerIntervalTime
+	 *            the samplerIntervalTime to set
+	 */
+	public void setSamplerIntervalTime(int samplerIntervalTime) {
+		this.samplerIntervalTime = samplerIntervalTime;
+	}
 
 	/**
-     * @return the samplerFilePath
-     */
-    public String getSamplerFilePath() {
-    	return samplerFilePath;
-    }
+	 * @return the samplerFilePath
+	 */
+	public String getSamplerFilePath() {
+		return samplerFilePath;
+	}
 
 	/**
-     * @return the samplerIntervalTime
-     */
-    public int getSamplerIntervalTime() {
-    	return samplerIntervalTime;
-    }
+	 * @return the samplerIntervalTime
+	 */
+	public int getSamplerIntervalTime() {
+		return samplerIntervalTime;
+	}
 
 }
