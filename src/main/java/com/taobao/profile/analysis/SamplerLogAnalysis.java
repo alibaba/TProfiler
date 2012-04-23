@@ -40,10 +40,11 @@ public class SamplerLogAnalysis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-        if (args.length != 3) {
-            System.err.println("Usage: <tsampler.log path> <samplermethodresult.log path> <samplerthreadresult.log path>");
-            return;
-        }
+		if (args.length != 3) {
+			System.err
+					.println("Usage: <tsampler.log path> <samplermethodresult.log path> <samplerthreadresult.log path>");
+			return;
+		}
 		SamplerLogAnalysis analysis = new SamplerLogAnalysis(args[0]);
 		analysis.reader();
 		analysis.printMethodResult(args[1]);
@@ -156,7 +157,7 @@ public class SamplerLogAnalysis {
 				writer.write(entry.getMethodName());
 				writer.write("\t");
 				writer.write(String.valueOf(entry.getCount()));
-				writer.write("\r");
+				writer.write("\n");
 
 				count++;
 				if ((count % 30) == 0) {
@@ -206,7 +207,7 @@ public class SamplerLogAnalysis {
 				writer.write(entry.getThreadState());
 				writer.write("\t");
 				writer.write(String.valueOf(entry.getCount()));
-				writer.write("\r");
+				writer.write("\n");
 
 				count++;
 				if ((count % 30) == 0) {
