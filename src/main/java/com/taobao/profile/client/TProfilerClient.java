@@ -55,6 +55,16 @@ public class TProfilerClient {
 	}
 
 	/**
+	 * 远程刷出方法数据
+	 * 
+	 * @param server
+	 *            ip
+	 */
+	public static void flushMethod(String server) {
+		doSend("flushmethod", server);
+	}
+
+	/**
 	 * 建立远程连接并发送命令
 	 * 
 	 * @param command
@@ -150,6 +160,8 @@ public class TProfilerClient {
 			start(args[0]);
 		} else if (args[1].toLowerCase().equals("stop")) {
 			stop(args[0]);
+		} else if (args[1].toLowerCase().equals("flushmethod")) {
+			flushMethod(args[0]);
 		} else {
 			System.out.println(status(args[0]));
 		}

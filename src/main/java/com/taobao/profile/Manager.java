@@ -50,6 +50,10 @@ public class Manager {
 	 */
 	public static final String STATUS = "status";
 	/**
+	 * 远程刷出方法数据
+	 */
+	public static final String FLUSHMETHOD = "flushmethod";
+	/**
 	 * 是否用纳秒采集
 	 */
 	private static boolean NEED_NANO_TIME;
@@ -97,7 +101,7 @@ public class Manager {
 	 * 将性能分析数据写出到磁盘
 	 */
 	private final DataDumpThread dumpThread;
-	
+
 	/**
 	 * 采样线程
 	 */
@@ -168,11 +172,11 @@ public class Manager {
 	}
 
 	/**
-     * @return the switchProfile
-     */
-    public boolean getSwitchProfile() {
-    	return switchProfile.get();
-    }
+	 * @return the switchProfile
+	 */
+	public boolean getSwitchProfile() {
+		return switchProfile.get();
+	}
 
 	/**
 	 * @param canProfile

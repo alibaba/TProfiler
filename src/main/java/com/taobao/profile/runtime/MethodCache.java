@@ -10,6 +10,10 @@ package com.taobao.profile.runtime;
 
 import java.util.Vector;
 
+import com.taobao.profile.Manager;
+import com.taobao.profile.Profiler;
+import com.taobao.profile.utils.DailyRollingFileWriter;
+
 /**
  * 方法名缓存,用ID代替方法名进行剖析,提升性能
  * 
@@ -70,14 +74,31 @@ public class MethodCache {
 	}
 
 	/**
-	 * 取得方法名
-	 * 
-	 * @param id
-	 * @return
+	 * 写出方法信息
 	 */
-	public static String getClasssMethodInfo(int id) {
-		MethodInfo method = mCacheMethods.get(id);
-		return method.toString();
-	}
+	public synchronized static void flushMethodData() {
+		DailyRollingFileWriter fileWriter = new DailyRollingFileWriter(Manager.METHOD_LOG_PATH);
 
+		fileWriter.append("instrumentclass:");
+		fileWriter.append(String.valueOf(Profiler.instrumentClassCount));
+		fileWriter.append(" instrumentmethod:");
+		fileWriter.append(String.valueOf(Profiler.instrumentMethodCount));
+		fileWriter.append("\n");
+
+		Vector<MethodInfo> vector = MethodCache.mCacheMethods;
+		int size = vector.size();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < size; i++) {
+			sb.append(i);
+			sb.append(' ');
+			sb.append(vector.get(i).toString());
+			sb.append('\n');
+			fileWriter.append(sb.toString());
+			sb.setLength(0);
+			if ((i % 50) == 0) {
+				fileWriter.flushAppend();
+			}
+		}
+		fileWriter.closeFile();
+	}
 }

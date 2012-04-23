@@ -12,7 +12,7 @@ import java.util.Calendar;
 
 import com.taobao.profile.Manager;
 import com.taobao.profile.config.ProfConfig;
-import com.taobao.profile.utils.MethodDump;
+import com.taobao.profile.runtime.MethodCache;
 
 /**
  * 开始时间结束时间控制线程
@@ -115,7 +115,7 @@ public class TimeControlThread extends Thread {
 				} else {
 					Manager.instance().setCanProfile(false);
 					Manager.instance().setPauseProfile(true);
-					MethodDump.flushMethodData();
+					MethodCache.flushMethodData();
 					time = nextStartTime(startTime);
 					await(time);
 				}

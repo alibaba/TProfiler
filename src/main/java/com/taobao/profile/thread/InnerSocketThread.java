@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import com.taobao.profile.Manager;
+import com.taobao.profile.runtime.MethodCache;
 
 /**
  * 对外提供Socket开关
@@ -50,6 +51,8 @@ public class InnerSocketThread extends Thread {
 					Manager.instance().setSwitchProfile(true);
 				} else if (Manager.STATUS.equals(command)) {
 					write(child.getOutputStream());
+				} else if (Manager.FLUSHMETHOD.equals(command)) {
+					MethodCache.flushMethodData();
 				} else {
 					Manager.instance().setSwitchProfile(false);
 				}
