@@ -95,7 +95,7 @@ public class Profiler {
 			if (thrData == null) {
 				return;
 			}
-			//栈太深则抛弃一部分数据
+			// 栈太深则抛弃一部分数据
 			if (thrData.stackFrame.size() > 10000) {
 				thrData.stackNum--;
 				thrData.stackFrame.pop();
@@ -103,13 +103,13 @@ public class Profiler {
 			}
 
 			if (thrData.stackNum <= 0) {
-				//没有执行start,直接执行end
+				// 没有执行start,直接执行end
 				return;
 			}
 			thrData.stackNum--;
 
 			if (thrData.stackFrame.size() == 0) {
-				//可能是异步停止导致的，忽略
+				// 可能是异步停止导致的，忽略
 				return;
 			}
 			long[] frameData = thrData.stackFrame.pop();
@@ -128,6 +128,16 @@ public class Profiler {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static void clearData() {
+		for (int index = 0; index < threadProfile.length; index++) {
+			ThreadData profilerData = threadProfile[index];
+			if (profilerData == null) {
+				continue;
+			}
+			profilerData.clear();
 		}
 	}
 }

@@ -8,6 +8,8 @@
  */
 package com.taobao.profile.thread;
 
+import java.util.concurrent.TimeUnit;
+
 import com.taobao.profile.Manager;
 import com.taobao.profile.Profiler;
 import com.taobao.profile.config.ProfConfig;
@@ -27,11 +29,11 @@ public class DataDumpThread extends Thread {
 	 */
 	private DailyRollingFileWriter fileWriter;
 	/**
-	 * 默认profile时间(ms)
+	 * 默认profile时间(s)
 	 */
 	private int eachProfUseTime;
 	/**
-	 * 两次profile间隔时间(ms)
+	 * 两次profile间隔时间(s)
 	 */
 	private int eachProfIntervalTime;
 
@@ -43,8 +45,8 @@ public class DataDumpThread extends Thread {
 	public DataDumpThread(ProfConfig config) {
 		// 读取用户配置
 		fileWriter = new DailyRollingFileWriter(config.getLogFilePath());
-		eachProfUseTime = config.getEachProfUseTime() * 1000;
-		eachProfIntervalTime = config.getEachProfIntervalTime() * 1000;
+		eachProfUseTime = config.getEachProfUseTime();
+		eachProfIntervalTime = config.getEachProfIntervalTime();
 	}
 
 	/*
@@ -61,17 +63,17 @@ public class DataDumpThread extends Thread {
 
 		while (true) {
 			try {
-				sleep(eachProfUseTime);
+				TimeUnit.SECONDS.sleep(eachProfUseTime);
 				if (!Manager.instance().canDump()) {
 					continue;
 				}
 				Manager.instance().setPauseProfile(true);
 				// 等待暂停生效
-				sleep(500);
+				TimeUnit.MILLISECONDS.sleep(500);
 
 				dumpProfileData();
 
-				sleep(eachProfIntervalTime);
+				TimeUnit.SECONDS.sleep(eachProfIntervalTime);
 				Manager.instance().setPauseProfile(false);
 			} catch (Exception e) {
 				e.printStackTrace();

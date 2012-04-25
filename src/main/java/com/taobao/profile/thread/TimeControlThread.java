@@ -9,8 +9,10 @@
 package com.taobao.profile.thread;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import com.taobao.profile.Manager;
+import com.taobao.profile.Profiler;
 import com.taobao.profile.config.ProfConfig;
 import com.taobao.profile.runtime.MethodCache;
 
@@ -92,16 +94,16 @@ public class TimeControlThread extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
+		if (startTime == null || endTime == null) {
+			return;
+		}
 		try {
 			// delay 30s
-			Thread.sleep(30000);
+			TimeUnit.SECONDS.sleep(30);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
-		if (startTime == null || endTime == null) {
-			return;
-		}
 		while (true) {
 			long time = waitTime(startTime);
 			if (time > 0) {
@@ -109,6 +111,7 @@ public class TimeControlThread extends Thread {
 			} else {
 				time = waitTime(endTime);
 				if (time > 0) {
+					Profiler.clearData();
 					Manager.instance().setCanProfile(true);
 					Manager.instance().setPauseProfile(false);
 					await(time);

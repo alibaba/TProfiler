@@ -73,15 +73,15 @@ public class Manager {
 	private ProfConfig profConfig;
 
 	/**
-	 * 当前时间大于开始时间小于结束时间,则可以profile
+	 * 当前时间大于开始时间小于结束时间,则可以profile. default:false 不可以profile
 	 */
 	private AtomicBoolean canProfile = new AtomicBoolean(false);
 	/**
-	 * 暂停profile,将log写到硬盘
+	 * 暂停profile,将log写到硬盘. default:true 暂停
 	 */
 	private AtomicBoolean pauseProfile = new AtomicBoolean(true);
 	/**
-	 * 远程开始或结束的开关
+	 * 远程开始或结束的开关. default:true 开始
 	 */
 	private AtomicBoolean switchProfile = new AtomicBoolean(true);
 
