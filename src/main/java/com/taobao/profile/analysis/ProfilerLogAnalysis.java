@@ -104,6 +104,10 @@ public class ProfilerLogAnalysis {
 					}
 					continue;
 				}
+				if ("=".equals(line)) {
+					currentthreadId = -1;
+					doMerge();
+				}
 				String[] data = line.split("\t");
 				if (data.length != 4) {
 					continue;
@@ -157,9 +161,9 @@ public class ProfilerLogAnalysis {
 			for (int j = i + 1; j < threadList.size(); j++) {
 				MethodStack tmp = threadList.get(j);
 				long tmpStack = tmp.stackNum;
-				if (tmpStack - statck == 1) {
+				if (statck + 1 == tmpStack) {
 					m.useTime -= tmp.useTime;
-				} else if (tmpStack - statck <= 0) {
+				} else if (statck >= tmpStack) {
 					break;
 				}
 			}
@@ -172,13 +176,11 @@ public class ProfilerLogAnalysis {
 			TimeSortData sortData = cacheMethodMap.get(m.methodId);
 			if (sortData == null) {
 				sortData = new TimeSortData();
-				sortData.methodName = methodIdMap.get(m.methodId);
-				sortData.valueStack.add(m.useTime);
-				sortData.size++;
+				sortData.setMethodName(methodIdMap.get(m.methodId));
+				sortData.addStackValue(m.useTime);
 				cacheMethodMap.put(m.methodId, sortData);
 			} else {
-				sortData.valueStack.add(m.useTime);
-				sortData.size++;
+				sortData.addStackValue(m.useTime);
 			}
 		}
 		threadList.clear();
@@ -199,17 +201,17 @@ public class ProfilerLogAnalysis {
 			topObjectWriter = new BufferedWriter(new FileWriter(topObjectPath));
 			for (TimeSortData data : list) {
 				StringBuilder sb = new StringBuilder();
-				Stack<Long> stack = data.valueStack;
+				Stack<Long> stack = data.getValueStack();
 
 				long executeNum = stack.size();
 				long allTime;
 				if (nano) {
-					allTime = Math.div(data.sum, 1000000);
+					allTime = Math.div(data.getSum(), 1000000);
 				} else {
-					allTime = data.sum;
+					allTime = data.getSum();
 				}
 				long useTime = Math.div(allTime, executeNum);
-				sb.append(data.methodName);
+				sb.append(data.getMethodName());
 				sb.append("\t");
 				sb.append(executeNum);
 				sb.append("\t");
@@ -218,7 +220,7 @@ public class ProfilerLogAnalysis {
 				sb.append(allTime);
 				sb.append("\n");
 				topMethodWriter.write(sb.toString());
-				if (data.methodName != null && data.methodName.contains("<init>")) {
+				if (data.getMethodName() != null && data.getMethodName().contains("<init>")) {
 					topObjectWriter.write(sb.toString());
 				}
 			}

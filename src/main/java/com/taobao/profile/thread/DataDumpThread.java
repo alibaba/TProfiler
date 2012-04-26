@@ -114,5 +114,7 @@ public class DataDumpThread extends Thread {
 			fileWriter.flushAppend();
 			profilerData.clear();
 		}
+		fileWriter.append("=\n");
+		fileWriter.flushAppend();
 	}
 }

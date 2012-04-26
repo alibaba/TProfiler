@@ -18,28 +18,55 @@ import java.util.Stack;
  */
 public class TimeSortData implements Comparable<TimeSortData> {
 
-	public float max;
-	public float min;
-	public long size = 0;
-	public long sum = 0;
-	public String methodName;
-	public Stack<Long> valueStack = new Stack<Long>();
+	private long sum = 0;
+	private String methodName;
+	private Stack<Long> valueStack = new Stack<Long>();
 
 	/**
-	 * @return
+	 * @return the methodName
 	 */
-	private long getValue() {
-		for (long v : valueStack) {
-			sum = Math.add(sum, v);
-		}
+	public String getMethodName() {
+		return methodName;
+	}
+
+	/**
+	 * @param methodName
+	 *            the methodName to set
+	 */
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
+	/**
+	 * @return the valueStack
+	 */
+	public Stack<Long> getValueStack() {
+		return valueStack;
+	}
+
+	/**
+	 * @param useTime
+	 * 
+	 */
+	public void addStackValue(long useTime) {
+		valueStack.add(useTime);
+		sum += useTime;
+	}
+
+	/**
+	 * @return the sum
+	 */
+	public long getSum() {
 		return sum;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(TimeSortData o) {
-		if (this.getValue() > o.getValue()) {
+		if (this.sum > o.sum) {
 			return -1;
 		} else {
 			return 1;

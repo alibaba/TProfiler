@@ -29,7 +29,7 @@ public class MethodCache {
 	/**
 	 * 方法名缓存
 	 */
-	public static Vector<MethodInfo> mCacheMethods = new Vector<MethodInfo>(INIT_CACHE_SIZE);
+	private static Vector<MethodInfo> mCacheMethods = new Vector<MethodInfo>(INIT_CACHE_SIZE);
 
 	/**
 	 * 占位并生成方法ID
@@ -85,7 +85,7 @@ public class MethodCache {
 		fileWriter.append(String.valueOf(Profiler.instrumentMethodCount));
 		fileWriter.append("\n");
 
-		Vector<MethodInfo> vector = MethodCache.mCacheMethods;
+		Vector<MethodInfo> vector = mCacheMethods;
 		int size = vector.size();
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < size; i++) {

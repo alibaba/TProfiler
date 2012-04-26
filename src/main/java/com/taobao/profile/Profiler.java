@@ -92,26 +92,17 @@ public class Profiler {
 		}
 		try {
 			ThreadData thrData = threadProfile[(int) threadId];
-			if (thrData == null) {
+			if (thrData == null || thrData.stackNum <= 0 || thrData.stackFrame.size() == 0) {
+				// 没有执行start,直接执行end/可能是异步停止导致的
 				return;
 			}
-			// 栈太深则抛弃一部分数据
-			if (thrData.stackFrame.size() > 10000) {
+			// 栈太深则抛弃部分数据
+			if (thrData.profileData.size() > 20000) {
 				thrData.stackNum--;
 				thrData.stackFrame.pop();
 				return;
 			}
-
-			if (thrData.stackNum <= 0) {
-				// 没有执行start,直接执行end
-				return;
-			}
 			thrData.stackNum--;
-
-			if (thrData.stackFrame.size() == 0) {
-				// 可能是异步停止导致的，忽略
-				return;
-			}
 			long[] frameData = thrData.stackFrame.pop();
 			long id = frameData[0];
 			if (methodId != id) {
