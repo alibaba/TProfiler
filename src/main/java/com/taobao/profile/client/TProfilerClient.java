@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import com.taobao.profile.Manager;
+
 /**
  * TProfiler客户端,用来远程打开 关闭及查看状态
  * 
@@ -31,7 +33,7 @@ public class TProfilerClient {
 	 *            ip
 	 */
 	public static void start(String server) {
-		doSend("start", server);
+		doSend(Manager.START, server);
 	}
 
 	/**
@@ -41,7 +43,7 @@ public class TProfilerClient {
 	 *            ip
 	 */
 	public static void stop(String server) {
-		doSend("stop", server);
+		doSend(Manager.STOP, server);
 	}
 
 	/**
@@ -51,7 +53,7 @@ public class TProfilerClient {
 	 * @return
 	 */
 	public static String status(String server) {
-		return getStatus("status", server);
+		return getStatus(Manager.STATUS, server);
 	}
 
 	/**
@@ -61,7 +63,7 @@ public class TProfilerClient {
 	 *            ip
 	 */
 	public static void flushMethod(String server) {
-		doSend("flushmethod", server);
+		doSend(Manager.FLUSHMETHOD, server);
 	}
 
 	/**
@@ -73,7 +75,7 @@ public class TProfilerClient {
 	private static void doSend(String command, String server) {
 		Socket socket = null;
 		try {
-			socket = new Socket(server, 50000);
+			socket = new Socket(server, Manager.PORT);
 			OutputStream os = socket.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream(os);
 			out.write(command.getBytes());
@@ -104,7 +106,7 @@ public class TProfilerClient {
 	private static String getStatus(String command, String server) {
 		Socket socket = null;
 		try {
-			socket = new Socket(server, 50000);
+			socket = new Socket(server, Manager.PORT);
 			OutputStream os = socket.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream(os);
 			out.write(command.getBytes());
@@ -153,14 +155,14 @@ public class TProfilerClient {
 	 */
 	public static void main(String[] args) {
 		if (args.length != 2) {
-			System.err.println("Usage: <server ip> <command[start/stop/status]>");
+			System.err.println("Usage: <server ip> <command[start/stop/status/flushmethod]>");
 			return;
 		}
-		if (args[1].toLowerCase().equals("start")) {
+		if (args[1].toLowerCase().equals(Manager.START)) {
 			start(args[0]);
-		} else if (args[1].toLowerCase().equals("stop")) {
+		} else if (args[1].toLowerCase().equals(Manager.STOP)) {
 			stop(args[0]);
-		} else if (args[1].toLowerCase().equals("flushmethod")) {
+		} else if (args[1].toLowerCase().equals(Manager.FLUSHMETHOD)) {
 			flushMethod(args[0]);
 		} else {
 			System.out.println(status(args[0]));
