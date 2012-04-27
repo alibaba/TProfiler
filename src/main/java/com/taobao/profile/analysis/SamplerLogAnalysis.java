@@ -68,11 +68,12 @@ public class SamplerLogAnalysis {
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("Thread\t")) {
-					Integer tmpCount = originalThreadMap.get(line);
+					String key = line.substring(0, line.lastIndexOf('\t'));
+					Integer tmpCount = originalThreadMap.get(key);
 					if (tmpCount == null) {
-						originalThreadMap.put(line, 1);
+						originalThreadMap.put(key, 1);
 					} else {
-						originalThreadMap.put(line, tmpCount.intValue() + 1);
+						originalThreadMap.put(key, tmpCount.intValue() + 1);
 					}
 				} else {
 					if (line.startsWith("com") || line.startsWith("org")) {
