@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.taobao.profile.utils.MathUtils;
+
 /**
  * 分析Profiler生成的Log
  * 
@@ -206,11 +208,11 @@ public class ProfilerLogAnalysis {
 				long executeNum = stack.size();
 				long allTime;
 				if (nano) {
-					allTime = Math.div(data.getSum(), 1000000);
+					allTime = MathUtils.div(data.getSum(), 1000000);
 				} else {
 					allTime = data.getSum();
 				}
-				long useTime = Math.div(allTime, executeNum);
+				long useTime = MathUtils.div(allTime, executeNum);
 				sb.append(data.getMethodName());
 				sb.append("\t");
 				sb.append(executeNum);

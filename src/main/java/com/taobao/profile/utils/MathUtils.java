@@ -6,7 +6,7 @@
  * version 2 as published by the Free Software Foundation.
  * 
  */
-package com.taobao.profile.analysis;
+package com.taobao.profile.utils;
 
 import java.math.BigDecimal;
 
@@ -16,9 +16,9 @@ import java.math.BigDecimal;
  * @author shutong.dy
  * @since 2012-1-11
  */
-public class Math {
+public class MathUtils {
 
-	private Math() {
+	private MathUtils() {
 	}
 
 	/**
