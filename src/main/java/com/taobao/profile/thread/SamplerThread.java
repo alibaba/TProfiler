@@ -85,7 +85,7 @@ public class SamplerThread extends Thread {
 				// sleep
 				TimeUnit.SECONDS.sleep(samplerIntervalTime);
 			}
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (fileWriter != null) {

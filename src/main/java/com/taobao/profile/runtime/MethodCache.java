@@ -30,6 +30,11 @@ public class MethodCache {
 	 * 方法名缓存
 	 */
 	private static Vector<MethodInfo> mCacheMethods = new Vector<MethodInfo>(INIT_CACHE_SIZE);
+	
+	/**
+	 * 方法名writer
+	 */
+	private static DailyRollingFileWriter fileWriter = new DailyRollingFileWriter(Manager.METHOD_LOG_PATH);
 
 	/**
 	 * 占位并生成方法ID
@@ -77,8 +82,6 @@ public class MethodCache {
 	 * 写出方法信息
 	 */
 	public synchronized static void flushMethodData() {
-		DailyRollingFileWriter fileWriter = new DailyRollingFileWriter(Manager.METHOD_LOG_PATH);
-
 		fileWriter.append("instrumentclass:");
 		fileWriter.append(String.valueOf(Profiler.instrumentClassCount));
 		fileWriter.append(" instrumentmethod:");
@@ -99,6 +102,6 @@ public class MethodCache {
 				fileWriter.flushAppend();
 			}
 		}
-		fileWriter.closeFile();
+		fileWriter.flushAppend();
 	}
 }
