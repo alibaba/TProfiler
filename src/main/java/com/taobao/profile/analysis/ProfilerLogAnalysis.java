@@ -33,7 +33,7 @@ public class ProfilerLogAnalysis {
 
 	private String logPath;
 	private String methodPath;
-	private boolean nano;
+	private boolean nano = false;
 	private long currentthreadId = -1;
 	private List<MethodStack> threadList = new ArrayList<MethodStack>();
 	private Map<Long, TimeSortData> cacheMethodMap = new HashMap<Long, TimeSortData>();

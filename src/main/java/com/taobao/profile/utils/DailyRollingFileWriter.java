@@ -60,7 +60,7 @@ public class DailyRollingFileWriter {
 	 */
 	public DailyRollingFileWriter(String filePath) {
 		fileName = filePath;
-		createWriter(filePath, 8 * 1024);
+		createWriter(filePath);
 		rollingFileName = fileName + sdf.format(new Date());
 	}
 
@@ -146,17 +146,16 @@ public class DailyRollingFileWriter {
 
 		File file = new File(fileName);
 		file.renameTo(target);
-		createWriter(fileName, 8 * 1024);
+		createWriter(fileName);
 		rollingFileName = datedFilename;
 	}
 
 	/**
 	 * @param filename
-	 * @param bufferSize
 	 */
-	private void createWriter(String filename, int bufferSize) {
+	private void createWriter(String filename) {
 		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(filename), bufferSize);
+			bufferedWriter = new BufferedWriter(new FileWriter(filename, true), 8 * 1024);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -55,12 +55,6 @@ public class DataDumpThread extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
-		// 写log文件头
-		boolean nano = Manager.isNeedNanoTime();
-		fileWriter.setLogHeadContent("##nano:" + nano + "\n");
-		fileWriter.printLogHeadContent();
-		fileWriter.flushAppend();
-
 		while (true) {
 			try {
 				TimeUnit.SECONDS.sleep(eachProfUseTime);
