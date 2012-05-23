@@ -12,10 +12,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
 
 /**
  * 将log写出,具备日滚功能
@@ -25,33 +25,33 @@ import java.util.Date;
  */
 public class DailyRollingFileWriter {
 	/**
-	 * 
+	 * 文件名
 	 */
 	private String fileName;
 	/**
-	 * 
+	 * 日滚文件名
 	 */
 	private String rollingFileName;
 	/**
-	 * 
+	 * BufferedWriter实例
 	 */
 	private BufferedWriter bufferedWriter;
 
 	/**
-	 * 
+	 * 日志头
 	 */
 	private String logHeadContent = "";
 
 	/**
-	 * 
+	 * 获取下次滚动时间的Calendar
 	 */
 	private RollingCalendar rollingCalendar = new RollingCalendar();
 	/**
-	 * 
+	 * 格式化工具
 	 */
 	private SimpleDateFormat sdf = new SimpleDateFormat("'.'yyyy-MM-dd");
 	/**
-	 * 
+	 * 下次的滚动时间
 	 */
 	private long nextRollingTime = rollingCalendar.getNextRollingMillis(new Date());
 
@@ -61,7 +61,18 @@ public class DailyRollingFileWriter {
 	public DailyRollingFileWriter(String filePath) {
 		fileName = filePath;
 		createWriter(filePath);
-		rollingFileName = fileName + sdf.format(new Date());
+		Date now = new Date();
+		rollingFileName = fileName + sdf.format(now);
+
+		// 最后修改时间不是今天,做滚动
+		File file = new File(filePath);
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		Date lastModifiedDate = new Date(file.lastModified());
+		String lastModified = dateFormat.format(lastModifiedDate);
+		if (!lastModified.equals(dateFormat.format(now))) {
+			rollingFileName = fileName + sdf.format(lastModifiedDate);
+			rolling(now);
+		}
 	}
 
 	/**
@@ -84,9 +95,9 @@ public class DailyRollingFileWriter {
 	public void append(String log) {
 		long time = System.currentTimeMillis();
 		if (time > nextRollingTime) {
-			nextRollingTime = rollingCalendar.getNextRollingMillis(new Date());
-			rolling();
-			printLogHeadContent();
+			Date now = new Date();
+			nextRollingTime = rollingCalendar.getNextRollingMillis(now);
+			rolling(now);
 		}
 		subappend(log);
 	}
@@ -130,10 +141,9 @@ public class DailyRollingFileWriter {
 	}
 
 	/**
-	 * 
+	 * @param now
 	 */
-	private void rolling() {
-		Date now = new Date();
+	private void rolling(Date now) {
 		String datedFilename = fileName + sdf.format(now);
 		if (rollingFileName.equals(datedFilename)) {
 			return;
