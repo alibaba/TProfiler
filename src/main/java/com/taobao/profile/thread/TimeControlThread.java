@@ -113,12 +113,10 @@ public class TimeControlThread extends Thread {
 				if (time > 0) {
 					Profiler.clearData();
 					Manager.instance().setCanProfile(true);
-					Manager.instance().setPauseProfile(false);
 					await(time);
 					MethodCache.flushMethodData();
 				} else {
 					Manager.instance().setCanProfile(false);
-					Manager.instance().setPauseProfile(true);
 					time = nextStartTime(startTime);
 					await(time);
 				}

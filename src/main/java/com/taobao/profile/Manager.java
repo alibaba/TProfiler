@@ -77,9 +77,9 @@ public class Manager {
 	 */
 	private AtomicBoolean canProfile = new AtomicBoolean(false);
 	/**
-	 * 暂停profile,将log写到硬盘. default:true 暂停
+	 * 暂停profile,将log写到硬盘. default:false 不暂停  true 暂停
 	 */
-	private AtomicBoolean pauseProfile = new AtomicBoolean(true);
+	private AtomicBoolean pauseProfile = new AtomicBoolean(false);
 	/**
 	 * 远程开始或结束的开关. default:true 开始
 	 */
