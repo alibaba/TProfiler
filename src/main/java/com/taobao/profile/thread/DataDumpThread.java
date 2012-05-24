@@ -71,6 +71,7 @@ public class DataDumpThread extends Thread {
 				Manager.instance().setPauseProfile(false);
 			} catch (Exception e) {
 				e.printStackTrace();
+				Profiler.clearData();
 			}
 		}
 	}
