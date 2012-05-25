@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.taobao</groupId>
 	<artifactId>tprofiler</artifactId>
-	<version>0.9.0</version>
+	<version>1.0.0</version>
 	<name>profile</name>
 	<packaging>jar</packaging>
 	<dependencies>

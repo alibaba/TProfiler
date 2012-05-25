@@ -2,7 +2,7 @@ TProfiler is a code profiling tool.
 
 author:shutong.dy@taobao.com
 
-Note: TProfiler requires Java5™ VM. 
+Note: TProfiler requires Java6™ VM.
 
 Please refer to Wiki for more information:
 https://github.com/taobao/TProfiler/wiki

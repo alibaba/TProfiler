@@ -8,7 +8,9 @@
  */
 package com.taobao.profile;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.taobao.profile.config.ProfConfig;
 import com.taobao.profile.config.ProfFilter;
@@ -73,62 +75,58 @@ public class Manager {
 	private ProfConfig profConfig;
 
 	/**
-	 * 当前时间大于开始时间小于结束时间,则可以profile. default:false 不可以profile
+	 * 时间标记.当前时间大于开始时间小于结束时间,则可以profile. default:false 不可以profile
 	 */
-	private AtomicBoolean canProfile = new AtomicBoolean(false);
+	private volatile boolean timeFlag = false;
 	/**
-	 * 暂停profile,将log写到硬盘. default:false 不暂停  true 暂停
+	 * 开关标记.远程开始或结束的开关. default:true 打开状态
 	 */
-	private AtomicBoolean pauseProfile = new AtomicBoolean(false);
+	private volatile boolean switchFlag = true;
 	/**
-	 * 远程开始或结束的开关. default:true 开始
+	 * profile标记.是否可以profile. default:false 不可以profile
 	 */
-	private AtomicBoolean switchProfile = new AtomicBoolean(true);
+	private volatile boolean profileFlag = false;
 
 	/**
 	 * 开始时间结束时间控制线程
 	 */
-	private final TimeControlThread controlThread;
+	private TimeControlThread controlThread;
 	/**
 	 * 对外提供Socket开关
 	 */
-	private final InnerSocketThread socketThread;
+	private InnerSocketThread socketThread;
 	/**
 	 * 将性能分析数据写出到磁盘
 	 */
-	private final DataDumpThread dumpThread;
-
+	private DataDumpThread dumpThread;
 	/**
 	 * 采样线程
 	 */
-	private final SamplerThread samplerThread;
+	private SamplerThread samplerThread;
+	/**
+	 * 启动时间是否大于采集结束时间
+	 */
+	private boolean moreThanEndTime;
 
 	/**
 	 * 私有构造器
 	 */
-	private Manager() {
+	private Manager() {}
+
+	/**
+	 * 初始化配置
+	 */
+	public void initialization() {
 		profConfig = new ProfConfig(DEFAULT_CONFIG);
 		NEED_NANO_TIME = profConfig.isNeedNanoTime();
 		IGNORE_GETSET_METHOD = profConfig.isIgnoreGetSetMethod();
 		METHOD_LOG_PATH = profConfig.getMethodFilePath();
+		// 判断启动时间是否大于采集结束时间 2012-05-25
+		DateFormat df = new SimpleDateFormat("HH:mm:ss");
+		String now = df.format(new Date());
+		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 ) ? true : false;
 
 		setProfFilter(profConfig);
-
-		controlThread = new TimeControlThread(profConfig);
-		controlThread.setName("TProfiler-TimeControl");
-		controlThread.setDaemon(true);
-
-		socketThread = new InnerSocketThread();
-		socketThread.setName("TProfiler-InnerSocket");
-		socketThread.setDaemon(true);
-
-		dumpThread = new DataDumpThread(profConfig);
-		dumpThread.setName("TProfiler-DataDump");
-		dumpThread.setDaemon(false);
-
-		samplerThread = new SamplerThread(profConfig);
-		samplerThread.setName("TProfiler-Sampler");
-		samplerThread.setDaemon(false);
 	}
 
 	/**
@@ -153,42 +151,46 @@ public class Manager {
 	}
 
 	/**
-	 * @param pause
+	 * @param timeFlag the timeFlag to set
 	 */
-	public void setPauseProfile(boolean pause) {
-		this.pauseProfile.getAndSet(pause);
+	public void setTimeFlag(boolean value) {
+		timeFlag = value;
 	}
 
 	/**
-	 * @param switchProfile
-	 *            the switchProfile to set
+	 * @param switchFlag the switchFlag to set
 	 */
-	public void setSwitchProfile(boolean switchProfile) {
-		this.switchProfile.getAndSet(switchProfile);
+	public void setSwitchFlag(boolean value) {
+		switchFlag = value;
 	}
 
 	/**
-	 * @return the switchProfile
+	 * @param profileFlag the profileFlag to set
 	 */
-	public boolean getSwitchProfile() {
-		return switchProfile.get();
-	}
-
-	/**
-	 * @param canProfile
-	 *            the canProfile to set
-	 */
-	public void setCanProfile(boolean canProfile) {
-		this.canProfile.getAndSet(canProfile);
+	public void setProfileFlag(boolean value) {
+		profileFlag = value;
 	}
 
 	/**
 	 * 判断当前是否可以采集数据
-	 * 
 	 * @return
 	 */
 	public boolean canProfile() {
-		return canProfile.get() && switchProfile.get() && !pauseProfile.get();
+		return profileFlag;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean getSwitchFlag() {
+		return switchFlag;
+	}
+
+	/**
+	 * @return the timeFlag
+	 */
+	public boolean getTimeFlag() {
+		return timeFlag;
 	}
 
 	/**
@@ -197,7 +199,15 @@ public class Manager {
 	 * @return
 	 */
 	public boolean canDump() {
-		return canProfile.get() && switchProfile.get();
+		return timeFlag && switchFlag;
+	}
+
+	/**
+	 * 启动时间是否大于profile结束时间
+	 * @return
+	 */
+	public boolean isMoreThanEndTime(){
+		return moreThanEndTime;
 	}
 
 	/**
@@ -228,6 +238,22 @@ public class Manager {
 	 * @param config
 	 */
 	public void startupThread() {
+		controlThread = new TimeControlThread(profConfig);
+		controlThread.setName("TProfiler-TimeControl");
+		controlThread.setDaemon(true);
+
+		socketThread = new InnerSocketThread();
+		socketThread.setName("TProfiler-InnerSocket");
+		socketThread.setDaemon(true);
+
+		dumpThread = new DataDumpThread(profConfig);
+		dumpThread.setName("TProfiler-DataDump");
+		dumpThread.setDaemon(false);
+
+		samplerThread = new SamplerThread(profConfig);
+		samplerThread.setName("TProfiler-Sampler");
+		samplerThread.setDaemon(false);
+
 		controlThread.start();
 		socketThread.start();
 		dumpThread.start();

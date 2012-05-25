@@ -17,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.taobao.profile.Manager;
+
 /**
  * 将log写出,具备日滚功能
  * 
@@ -60,18 +62,24 @@ public class DailyRollingFileWriter {
 	 */
 	public DailyRollingFileWriter(String filePath) {
 		fileName = filePath;
-		createWriter(filePath);
 		Date now = new Date();
 		rollingFileName = fileName + sdf.format(now);
-
-		// 最后修改时间不是今天,做滚动
 		File file = new File(filePath);
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		Date lastModifiedDate = new Date(file.lastModified());
-		String lastModified = dateFormat.format(lastModifiedDate);
-		if (!lastModified.equals(dateFormat.format(now))) {
-			rollingFileName = fileName + sdf.format(lastModifiedDate);
-			rolling(now);
+		// 文件已经存在
+		if (file.exists()) {
+			DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+			Date lastModifiedDate = new Date(file.lastModified());
+			String lastModified = dateFormat.format(lastModifiedDate);
+			if (lastModified.equals(dateFormat.format(now))) {
+				// 启动时间大于结束时间则续写; 启动时间小于结束时间则覆盖(true:续写 false:覆盖)
+				createWriter(filePath, Manager.instance().isMoreThanEndTime());
+			} else {
+				// 最后修改时间不是今天,做滚动
+				rollingFileName = fileName + sdf.format(lastModifiedDate);
+				rolling(now);
+			}
+		} else {
+			createWriter(filePath);
 		}
 	}
 
@@ -161,11 +169,25 @@ public class DailyRollingFileWriter {
 	}
 
 	/**
+	 * 可选是否覆盖旧文件
+	 * @param filename
+	 * @param append
+	 */
+	private void createWriter(String filename, boolean append) {
+		try {
+			bufferedWriter = new BufferedWriter(new FileWriter(filename, append), 8 * 1024);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 直接覆盖旧文件
 	 * @param filename
 	 */
 	private void createWriter(String filename) {
 		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(filename, true), 8 * 1024);
+			bufferedWriter = new BufferedWriter(new FileWriter(filename), 8 * 1024);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

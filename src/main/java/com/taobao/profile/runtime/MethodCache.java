@@ -74,8 +74,9 @@ public class MethodCache {
 	 * @param methodName
 	 */
 	public synchronized static void UpdateMethodName(int id, String className, String methodName) {
-		mCacheMethods.get(id).setMClassName(className);
-		mCacheMethods.get(id).setMMethodName(methodName);
+		MethodInfo methodInfo = mCacheMethods.get(id);
+		methodInfo.setMClassName(className);
+		methodInfo.setMMethodName(methodName);
 	}
 
 	/**

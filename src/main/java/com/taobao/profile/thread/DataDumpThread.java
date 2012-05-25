@@ -55,24 +55,33 @@ public class DataDumpThread extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
-		while (true) {
-			try {
-				TimeUnit.SECONDS.sleep(eachProfUseTime);
-				if (!Manager.instance().canDump()) {
-					continue;
+		try {
+			while (true) {
+				if (Manager.instance().canDump()) {
+					Manager.instance().setProfileFlag(true);
+					TimeUnit.SECONDS.sleep(eachProfUseTime);
+					Manager.instance().setProfileFlag(false);
+					// 等待已开始的End方法执行完成
+					TimeUnit.MILLISECONDS.sleep(500L);
+
+					dumpProfileData();
 				}
-				Manager.instance().setPauseProfile(true);
-				// 等待暂停生效
-				TimeUnit.MILLISECONDS.sleep(500);
-
-				dumpProfileData();
-
 				TimeUnit.SECONDS.sleep(eachProfIntervalTime);
-				Manager.instance().setPauseProfile(false);
-			} catch (Exception e) {
-				e.printStackTrace();
-				Profiler.clearData();
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			Manager.instance().setProfileFlag(false);
+			if (fileWriter != null) {
+				fileWriter.closeFile();
+			}
+			// 等待已开始的End方法执行完成
+			try {
+				TimeUnit.MILLISECONDS.sleep(500L);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			Profiler.clearData();
 		}
 	}
 

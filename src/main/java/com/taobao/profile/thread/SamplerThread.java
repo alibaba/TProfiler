@@ -51,35 +51,28 @@ public class SamplerThread extends Thread {
 	 */
 	public void run() {
 		try {
-			// delay 30s
-			TimeUnit.SECONDS.sleep(30);
 			while (true) {
 				if (Manager.instance().canDump()) {
-					try {
-						Date date = new Date();
-						Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
-						for (Map.Entry<Thread, StackTraceElement[]> entry : map.entrySet()) {
-							Thread thread = entry.getKey();
-							StringBuilder sb = new StringBuilder();
-							sb.append("Thread\t");
-							sb.append(thread.getId());
-							sb.append("\t");
-							sb.append(thread.getName());
-							sb.append("\t");
-							sb.append(thread.getState());
-							sb.append("\t");
-							sb.append(date);
-							sb.append("\n");
-							fileWriter.append(sb.toString());
-							for (StackTraceElement element : entry.getValue()) {
-								fileWriter.append(element.toString());
-								fileWriter.append("\n");
-							}
-							fileWriter.flushAppend();
+					Date date = new Date();
+					Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+					for (Map.Entry<Thread, StackTraceElement[]> entry : map.entrySet()) {
+						Thread thread = entry.getKey();
+						StringBuilder sb = new StringBuilder();
+						sb.append("Thread\t");
+						sb.append(thread.getId());
+						sb.append("\t");
+						sb.append(thread.getName());
+						sb.append("\t");
+						sb.append(thread.getState());
+						sb.append("\t");
+						sb.append(date);
+						sb.append("\n");
+						fileWriter.append(sb.toString());
+						for (StackTraceElement element : entry.getValue()) {
+							fileWriter.append(element.toString());
+							fileWriter.append("\n");
 						}
-					} catch (Exception e) {
-						e.printStackTrace();
-						TimeUnit.SECONDS.sleep(samplerIntervalTime);
+						fileWriter.flushAppend();
 					}
 				}
 				// sleep

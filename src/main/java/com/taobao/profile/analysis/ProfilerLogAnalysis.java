@@ -44,8 +44,7 @@ public class ProfilerLogAnalysis {
 	 */
 	public static void main(String[] args) {
 		if (args.length != 4) {
-			System.err
-					.println("Usage: <tprofiler.log path> <tmethod.log path> <topmethod.log path> <topobject.log path>");
+			System.err.println("Usage: <tprofiler.log path> <tmethod.log path> <topmethod.log path> <topobject.log path>");
 			return;
 		}
 		ProfilerLogAnalysis analysis = new ProfilerLogAnalysis(args[0], args[1]);

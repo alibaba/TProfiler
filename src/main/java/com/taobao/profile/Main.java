@@ -25,6 +25,7 @@ public class Main {
 	 * @param inst
 	 */
 	public static void premain(String args, Instrumentation inst) {
+		Manager.instance().initialization();
 		inst.addTransformer(new ProfTransformer());
 		Manager.instance().startupThread();
 	}

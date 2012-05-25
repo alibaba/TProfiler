@@ -48,13 +48,13 @@ public class InnerSocketThread extends Thread {
 				String command = read(child.getInputStream());
 
 				if (Manager.START.equals(command)) {
-					Manager.instance().setSwitchProfile(true);
+					Manager.instance().setSwitchFlag(true);
 				} else if (Manager.STATUS.equals(command)) {
 					write(child.getOutputStream());
 				} else if (Manager.FLUSHMETHOD.equals(command)) {
 					MethodCache.flushMethodData();
 				} else {
-					Manager.instance().setSwitchProfile(false);
+					Manager.instance().setSwitchFlag(false);
 				}
 				child.close();
 			}
@@ -102,7 +102,7 @@ public class InnerSocketThread extends Thread {
 	 */
 	private void write(OutputStream os) throws IOException {
 		BufferedOutputStream out = new BufferedOutputStream(os);
-		if (Manager.instance().getSwitchProfile()) {
+		if (Manager.instance().getSwitchFlag()) {
 			out.write("running".getBytes());
 		} else {
 			out.write("stop".getBytes());

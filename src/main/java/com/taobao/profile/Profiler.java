@@ -106,7 +106,6 @@ public class Profiler {
 			long[] frameData = thrData.stackFrame.pop();
 			long id = frameData[0];
 			if (methodId != id) {
-				thrData.stackFrame.pop();
 				return;
 			}
 			long useTime = endTime - frameData[2];
