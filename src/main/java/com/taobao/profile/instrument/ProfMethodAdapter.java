@@ -39,19 +39,17 @@ public class ProfMethodAdapter extends MethodAdapter {
 	public ProfMethodAdapter(MethodVisitor visitor, String fileName, String className, String methodName) {
 		super(visitor);
 		mMethodId = MethodCache.Request();
-		MethodCache.UpdateFileName(mMethodId, fileName);
-		MethodCache.UpdateMethodName(mMethodId, className, methodName);
+		MethodCache.UpdateMethodName(mMethodId, fileName, className, methodName);
+		// 记录方法数
+		Profiler.instrumentMethodCount.getAndIncrement();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.objectweb.asm.MethodAdapter#visitCode()
 	 */
 	public void visitCode() {
-		// 记录注入方法数
-		Profiler.instrumentMethodCount++;
 		this.visitLdcInsn(mMethodId);
 		this.visitMethodInsn(INVOKESTATIC, "com/taobao/profile/Profiler", "Start", "(I)V");
-
 		super.visitCode();
 	}
 

@@ -8,6 +8,8 @@
  */
 package com.taobao.profile;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.taobao.profile.runtime.ThreadData;
 
 /**
@@ -20,11 +22,11 @@ public class Profiler {
 	/**
 	 * 注入类数
 	 */
-	public static int instrumentClassCount;
+	public static AtomicInteger instrumentClassCount = new AtomicInteger(0);
 	/**
 	 * 注入方法数
 	 */
-	public static int instrumentMethodCount;
+	public static AtomicInteger instrumentMethodCount = new AtomicInteger(0);
 
 	private final static int size = 65535;
 	/**

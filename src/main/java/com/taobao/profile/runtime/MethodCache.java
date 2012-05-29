@@ -47,16 +47,6 @@ public class MethodCache {
 	}
 
 	/**
-	 * 更新文件名
-	 * 
-	 * @param id
-	 * @param fileName
-	 */
-	public synchronized static void UpdateFileName(int id, String fileName) {
-		mCacheMethods.get(id).setMFileName(fileName);
-	}
-
-	/**
 	 * 更新行号
 	 * 
 	 * @param id
@@ -70,11 +60,13 @@ public class MethodCache {
 	 * 更新类名方法名
 	 * 
 	 * @param id
+	 * @param fileName
 	 * @param className
 	 * @param methodName
 	 */
-	public synchronized static void UpdateMethodName(int id, String className, String methodName) {
+	public synchronized static void UpdateMethodName(int id, String fileName, String className, String methodName) {
 		MethodInfo methodInfo = mCacheMethods.get(id);
+		methodInfo.setMFileName(fileName);
 		methodInfo.setMClassName(className);
 		methodInfo.setMMethodName(methodName);
 	}
@@ -84,9 +76,9 @@ public class MethodCache {
 	 */
 	public synchronized static void flushMethodData() {
 		fileWriter.append("instrumentclass:");
-		fileWriter.append(String.valueOf(Profiler.instrumentClassCount));
+		fileWriter.append(Profiler.instrumentClassCount.toString());
 		fileWriter.append(" instrumentmethod:");
-		fileWriter.append(String.valueOf(Profiler.instrumentMethodCount));
+		fileWriter.append(Profiler.instrumentMethodCount.toString());
 		fileWriter.append("\n");
 
 		Vector<MethodInfo> vector = mCacheMethods;

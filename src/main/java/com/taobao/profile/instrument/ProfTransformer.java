@@ -40,7 +40,7 @@ public class ProfTransformer implements ClassFileTransformer {
 			return classfileBuffer;
 		}
 		// 记录注入类数
-		Profiler.instrumentClassCount++;
+		Profiler.instrumentClassCount.getAndIncrement();
 
 		try {
 			ClassReader reader = new ClassReader(classfileBuffer);
