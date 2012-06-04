@@ -107,6 +107,10 @@ public class Manager {
 	 * 启动时间是否大于采集结束时间
 	 */
 	private boolean moreThanEndTime;
+	/**
+	 * 是否进入调试模式
+	 */
+	private boolean isDebugMode;
 
 	/**
 	 * 私有构造器
@@ -125,8 +129,9 @@ public class Manager {
 		DateFormat df = new SimpleDateFormat("HH:mm:ss");
 		String now = df.format(new Date());
 		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 ) ? true : false;
+		isDebugMode = profConfig.isDebugMode();
 
-		setProfFilter(profConfig);
+		setProfFilter();
 	}
 
 	/**
@@ -211,20 +216,33 @@ public class Manager {
 	}
 
 	/**
+	 * @return the isDebugMode
+	 */
+	public boolean isDebugMode() {
+		return isDebugMode;
+	}
+
+	/**
 	 * 设置包名过滤器
 	 * 
-	 * @param profConfig
 	 */
-	private void setProfFilter(ProfConfig profConfig) {
+	private void setProfFilter() {
+		String classLoader = profConfig.getExcludeClassLoader();
+		if (classLoader != null && classLoader.trim().length() > 0) {
+			String[] _classLoader = classLoader.split(";");
+			for (String pack : _classLoader) {
+				ProfFilter.addExcludeClassLoader(pack);
+			}
+		}
 		String include = profConfig.getIncludePackageStartsWith();
-		if (include != null) {
+		if (include != null && include.trim().length() > 0) {
 			String[] _includes = include.split(";");
 			for (String pack : _includes) {
 				ProfFilter.addIncludeClass(pack);
 			}
 		}
 		String exclude = profConfig.getExcludePackageStartsWith();
-		if (exclude != null) {
+		if (exclude != null && exclude.trim().length() > 0) {
 			String[] _excludes = exclude.split(";");
 			for (String pack : _excludes) {
 				ProfFilter.addExcludeClass(pack);

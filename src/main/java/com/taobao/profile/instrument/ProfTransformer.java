@@ -16,6 +16,7 @@ import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
+import com.taobao.profile.Manager;
 import com.taobao.profile.Profiler;
 import com.taobao.profile.config.ProfFilter;
 
@@ -32,16 +33,21 @@ public class ProfTransformer implements ClassFileTransformer {
 	 */
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 	        ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+		if (ProfFilter.IsNotNeedInjectClassLoader(loader.getClass().getName())) {
+			return classfileBuffer;
+		}
 		if (!ProfFilter.IsNeedInject(className)) {
 			return classfileBuffer;
 		}
-
 		if (ProfFilter.IsNotNeedInject(className)) {
 			return classfileBuffer;
 		}
+		if (Manager.instance().isDebugMode()) {
+			System.out.println(" ---- TProfiler Debug: " + loader.getClass().getName() + " ---- " + className);
+		}
+
 		// 记录注入类数
 		Profiler.instrumentClassCount.getAndIncrement();
-
 		try {
 			ClassReader reader = new ClassReader(classfileBuffer);
 			ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);

@@ -20,28 +20,27 @@ import java.util.Set;
 public class ProfFilter {
 
 	/**
-	 * 注入Package集合
+	 * 注入的Package集合
 	 */
 	private static Set<String> includePackage = new HashSet<String>();
 	/**
-	 * 不注入Package集合
+	 * 不注入的Package集合
 	 */
 	private static Set<String> excludePackage = new HashSet<String>();
+	/**
+	 * 不注入的ClassLoader集合
+	 */
+	private static Set<String> excludeClassLoader = new HashSet<String>();
 
 	static {
 		// 默认不注入的Package
-		excludePackage.add("java");
-		excludePackage.add("javax");
-		excludePackage.add("sun");
-		excludePackage.add("sunw");
+		excludePackage.add("java");// 包含javax
+		excludePackage.add("sun");// 包含sunw
 		excludePackage.add("com/sun");
-
-		excludePackage.add("org/xml");
-		excludePackage.add("org/jboss");
-		excludePackage.add("org/apache/xerces");
-		excludePackage.add("org/objectweb/asm");
+		excludePackage.add("org");// 包含org/xml org/jboss org/apache/xerces org/objectweb/asm  
 		// 不注入profile本身
 		excludePackage.add("com/taobao/profile");
+		excludePackage.add("com/taobao/hsf");
 	}
 
 	/**
@@ -63,7 +62,15 @@ public class ProfFilter {
 	}
 
 	/**
-	 * 是否需要注入
+	 * 
+	 * @param classLoader
+	 */
+	public static void addExcludeClassLoader(String classLoader) {
+		excludeClassLoader.add(classLoader);
+	}
+
+	/**
+	 * 是否是需要注入的类
 	 * 
 	 * @param className
 	 * @return
@@ -79,7 +86,7 @@ public class ProfFilter {
 	}
 
 	/**
-	 * 是否不需要注入
+	 * 是否是不需要注入的类
 	 * 
 	 * @param className
 	 * @return
@@ -88,6 +95,21 @@ public class ProfFilter {
 		String icaseName = className.toLowerCase().replace('.', '/');
 		for (String v : excludePackage) {
 			if (icaseName.startsWith(v)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * 是否是不需要注入的类加载器
+	 * 
+	 * @param classLoader
+	 * @return
+	 */
+	public static boolean IsNotNeedInjectClassLoader(String classLoader) {
+		for (String v : excludeClassLoader) {
+			if (classLoader.equals(v)) {
 				return true;
 			}
 		}

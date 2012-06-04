@@ -49,6 +49,11 @@ public class ProfConfig {
 	private String samplerFilePath;
 
 	/**
+	 * 不包括的ClassLoader
+	 */
+	private String excludeClassLoader;
+
+	/**
 	 * 包括的包名
 	 */
 	private String includePackageStartsWith;
@@ -82,6 +87,11 @@ public class ProfConfig {
 	 * 是否忽略get/set方法
 	 */
 	private boolean ignoreGetSetMethod;
+
+	/**
+	 * 是否进入调试模式
+	 */
+	private boolean debugMode;
 
 	/**
 	 * 构造方法
@@ -122,6 +132,10 @@ public class ProfConfig {
 			String excludePackageStartsWith = resource.getProperty("excludePackageStartsWith");
 			String needNanoTime = resource.getProperty("needNanoTime");
 			String ignoreGetSetMethod = resource.getProperty("ignoreGetSetMethod");
+			String excludeClassLoader = resource.getProperty("excludeClassLoader");
+			String debugMode = resource.getProperty("debugMode");
+			setDebugMode("true".equals(debugMode));
+			setExcludeClassLoader(excludeClassLoader);
 			setExcludePackageStartsWith(excludePackageStartsWith);
 			setEndProfTime(endProfTime);
 			setIncludePackageStartsWith(includePackageStartsWith);
@@ -173,6 +187,10 @@ public class ProfConfig {
 			String excludePackageStartsWith = resource.getString("excludePackageStartsWith");
 			String needNanoTime = resource.getString("needNanoTime");
 			String ignoreGetSetMethod = resource.getString("ignoreGetSetMethod");
+			String excludeClassLoader = resource.getString("excludeClassLoader");
+			String debugMode = resource.getString("debugMode");
+			setDebugMode("true".equals(debugMode));
+			setExcludeClassLoader(excludeClassLoader);
 			setExcludePackageStartsWith(excludePackageStartsWith);
 			setEndProfTime(endProfTime);
 			setIncludePackageStartsWith(includePackageStartsWith);
@@ -373,4 +391,31 @@ public class ProfConfig {
 		return samplerIntervalTime;
 	}
 
+	/**
+	 * @return the excludeClassLoader
+	 */
+	public String getExcludeClassLoader() {
+		return excludeClassLoader;
+	}
+
+	/**
+	 * @param excludeClassLoader the excludeClassLoader to set
+	 */
+	public void setExcludeClassLoader(String excludeClassLoader) {
+		this.excludeClassLoader = excludeClassLoader;
+	}
+
+	/**
+	 * @return the debugMode
+	 */
+	public boolean isDebugMode() {
+		return debugMode;
+	}
+
+	/**
+	 * @param debugMode the debugMode to set
+	 */
+	public void setDebugMode(boolean debugMode) {
+		this.debugMode = debugMode;
+	}
 }
