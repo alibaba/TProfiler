@@ -266,11 +266,11 @@ public class Manager {
 
 		dumpThread = new DataDumpThread(profConfig);
 		dumpThread.setName("TProfiler-DataDump");
-		dumpThread.setDaemon(false);
+		dumpThread.setDaemon(true);
 
 		samplerThread = new SamplerThread(profConfig);
 		samplerThread.setName("TProfiler-Sampler");
-		samplerThread.setDaemon(false);
+		samplerThread.setDaemon(true);
 
 		controlThread.start();
 		socketThread.start();
