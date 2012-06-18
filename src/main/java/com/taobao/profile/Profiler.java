@@ -111,9 +111,11 @@ public class Profiler {
 				return;
 			}
 			long useTime = endTime - frameData[2];
-			if (Manager.isNeedNanoTime() && useTime > 500000) {
-				frameData[2] = useTime;
-				thrData.profileData.push(frameData);
+			if (Manager.isNeedNanoTime()) {
+				if (useTime > 500000) {
+					frameData[2] = useTime;
+					thrData.profileData.push(frameData);
+				}
 			} else if (useTime > 1) {
 				frameData[2] = useTime;
 				thrData.profileData.push(frameData);
