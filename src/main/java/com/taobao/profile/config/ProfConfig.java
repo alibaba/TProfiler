@@ -93,6 +93,11 @@ public class ProfConfig {
 	 */
 	private boolean debugMode;
 
+    /**
+     * Socket端口号配置
+     */
+    private int port;
+
 	/**
 	 * 构造方法
 	 */
@@ -134,6 +139,8 @@ public class ProfConfig {
 			String ignoreGetSetMethod = resource.getProperty("ignoreGetSetMethod");
 			String excludeClassLoader = resource.getProperty("excludeClassLoader");
 			String debugMode = resource.getProperty("debugMode");
+            String port = resource.getProperty("port");
+            setPort(port == null ? 50000 : Integer.valueOf(port));
 			setDebugMode("true".equals(debugMode));
 			setExcludeClassLoader(excludeClassLoader);
 			setExcludePackageStartsWith(excludePackageStartsWith);
@@ -189,6 +196,8 @@ public class ProfConfig {
 			String ignoreGetSetMethod = resource.getString("ignoreGetSetMethod");
 			String excludeClassLoader = resource.getString("excludeClassLoader");
 			String debugMode = resource.getString("debugMode");
+            String port = resource.getString("port");
+            setPort(port == null ? 50000 : Integer.valueOf(port));
 			setDebugMode("true".equals(debugMode));
 			setExcludeClassLoader(excludeClassLoader);
 			setExcludePackageStartsWith(excludePackageStartsWith);
@@ -418,4 +427,12 @@ public class ProfConfig {
 	public void setDebugMode(boolean debugMode) {
 		this.debugMode = debugMode;
 	}
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

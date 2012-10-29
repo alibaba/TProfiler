@@ -34,7 +34,7 @@ public class Manager {
 	/**
 	 * 远程连接端口
 	 */
-	public static final int PORT = 50000;
+	public static int PORT;
 	/**
 	 * 开始命令
 	 */
@@ -130,6 +130,7 @@ public class Manager {
 		String now = df.format(new Date());
 		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 ) ? true : false;
 		isDebugMode = profConfig.isDebugMode();
+        PORT = profConfig.getPort();
 
 		setProfFilter();
 	}
@@ -156,21 +157,21 @@ public class Manager {
 	}
 
 	/**
-	 * @param timeFlag the timeFlag to set
+	 * @param value the timeFlag to set
 	 */
 	public void setTimeFlag(boolean value) {
 		timeFlag = value;
 	}
 
 	/**
-	 * @param switchFlag the switchFlag to set
+	 * @param value the switchFlag to set
 	 */
 	public void setSwitchFlag(boolean value) {
 		switchFlag = value;
 	}
 
 	/**
-	 * @param profileFlag the profileFlag to set
+	 * @param value the profileFlag to set
 	 */
 	public void setProfileFlag(boolean value) {
 		profileFlag = value;
@@ -252,8 +253,7 @@ public class Manager {
 
 	/**
 	 * 启动内部线程
-	 * 
-	 * @param config
+	 *
 	 */
 	public void startupThread() {
 		controlThread = new TimeControlThread(profConfig);

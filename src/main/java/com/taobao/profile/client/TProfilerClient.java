@@ -26,56 +26,58 @@ import com.taobao.profile.Manager;
  */
 public class TProfilerClient {
 
-	/**
+    /**
 	 * 远程打开
-	 * 
-	 * @param server
-	 *            ip
-	 */
-	public static void start(String server) {
-		doSend(Manager.START, server);
+     *
+     * @param server
+     * @param port
+     */
+	public static void start(String server, int port) {
+		doSend(Manager.START, server, port);
 	}
 
 	/**
 	 * 远程关闭
-	 * 
-	 * @param server
-	 *            ip
-	 */
-	public static void stop(String server) {
-		doSend(Manager.STOP, server);
+     *
+     * @param server
+     * @param port
+     */
+	public static void stop(String server, int port) {
+		doSend(Manager.STOP, server, port);
 	}
 
 	/**
 	 * 获取状态
-	 * 
-	 * @param server
-	 * @return
-	 */
-	public static String status(String server) {
-		return getStatus(Manager.STATUS, server);
+	 *
+     * @param server
+     * @param port
+     * @return
+     */
+	public static String status(String server, int port) {
+		return getStatus(Manager.STATUS, server, port);
 	}
 
 	/**
 	 * 远程刷出方法数据
-	 * 
-	 * @param server
-	 *            ip
-	 */
-	public static void flushMethod(String server) {
-		doSend(Manager.FLUSHMETHOD, server);
+	 *
+     * @param server
+     * @param port
+     */
+	public static void flushMethod(String server, int port) {
+		doSend(Manager.FLUSHMETHOD, server, port);
 	}
 
 	/**
 	 * 建立远程连接并发送命令
-	 * 
-	 * @param command
-	 * @param server
-	 */
-	private static void doSend(String command, String server) {
+	 *
+     * @param command
+     * @param server
+     * @param port
+     */
+	private static void doSend(String command, String server, int port) {
 		Socket socket = null;
 		try {
-			socket = new Socket(server, Manager.PORT);
+			socket = new Socket(server, port);
 			OutputStream os = socket.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream(os);
 			out.write(command.getBytes());
@@ -98,15 +100,16 @@ public class TProfilerClient {
 
 	/**
 	 * 建立远程连接并发送命令
-	 * 
-	 * @param command
-	 * @param server
-	 * @return 0:运行状态 1:停止状态
-	 */
-	private static String getStatus(String command, String server) {
+	 *
+     * @param command
+     * @param server
+     * @param port
+     * @return
+     */
+	private static String getStatus(String command, String server, int port) {
 		Socket socket = null;
 		try {
-			socket = new Socket(server, Manager.PORT);
+			socket = new Socket(server, port);
 			OutputStream os = socket.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream(os);
 			out.write(command.getBytes());
@@ -154,18 +157,19 @@ public class TProfilerClient {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length != 2) {
-			System.err.println("Usage: <server ip> <command[start/stop/status/flushmethod]>");
+		if (args.length != 3) {
+			System.err.println("Usage: <server ip> <server port> <command[start/stop/status/flushmethod]>");
 			return;
 		}
-		if (args[1].toLowerCase().equals(Manager.START)) {
-			start(args[0]);
-		} else if (args[1].toLowerCase().equals(Manager.STOP)) {
-			stop(args[0]);
-		} else if (args[1].toLowerCase().equals(Manager.FLUSHMETHOD)) {
-			flushMethod(args[0]);
+        int port = Integer.valueOf(args[1]);
+		if (args[2].toLowerCase().equals(Manager.START)) {
+			start(args[0], port);
+		} else if (args[2].toLowerCase().equals(Manager.STOP)) {
+			stop(args[0], port);
+		} else if (args[2].toLowerCase().equals(Manager.FLUSHMETHOD)) {
+			flushMethod(args[0], port);
 		} else {
-			System.out.println(status(args[0]));
+			System.out.println(status(args[0], port));
 		}
 	}
 }
