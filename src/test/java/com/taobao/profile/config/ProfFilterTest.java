@@ -1,6 +1,5 @@
 package com.taobao.profile.config;
 
-import com.taobao.profile.Profiler;
 import org.junit.Assert;
 import org.junit.Test;
 

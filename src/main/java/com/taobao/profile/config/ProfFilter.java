@@ -115,4 +115,12 @@ public class ProfFilter {
 		}
 		return false;
 	}
+
+    public static void clear() {
+        //TODO this is for test teardown, and should be removed when ProfFilter is separated
+        includePackage.clear();
+        excludePackage.clear();
+        excludeClassLoader.clear();
+    }
+
 }
