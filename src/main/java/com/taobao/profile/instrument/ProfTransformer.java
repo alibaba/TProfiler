@@ -54,7 +54,7 @@ public class ProfTransformer implements ClassFileTransformer {
         try {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            ClassAdapter adapter = new ProfClassAdapter(writer, className);
+            ClassAdapter adapter = getClassAdapter(className, writer);
             reader.accept(adapter, 0);
             // 生成新类字节码
             return writer.toByteArray();
@@ -63,5 +63,9 @@ public class ProfTransformer implements ClassFileTransformer {
             // 返回旧类字节码
             return classfileBuffer;
         }
+    }
+
+    protected ClassAdapter getClassAdapter(String className, ClassWriter writer) {
+        return new ProfClassAdapter(writer, className);
     }
 }
