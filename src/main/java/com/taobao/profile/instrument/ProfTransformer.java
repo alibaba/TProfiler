@@ -33,19 +33,24 @@ public class ProfTransformer implements ClassFileTransformer {
 	 */
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 	        ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-		if (ProfFilter.isNotNeedInjectClassLoader(loader.getClass().getName())) {
-			return classfileBuffer;
-		}
-		if (!ProfFilter.isNeedInject(className)) {
-			return classfileBuffer;
-		}
-		if (ProfFilter.isNotNeedInject(className)) {
-			return classfileBuffer;
-		}
-		if (Manager.instance().isDebugMode()) {
+        if (!isNeedInject(loader, className)) return classfileBuffer;
+        if (Manager.instance().isDebugMode()) {
 			System.out.println(" ---- TProfiler Debug: " + loader.getClass().getName() + " ---- " + className);
 		}
         return transform(className, classfileBuffer);
+    }
+
+    private boolean isNeedInject(ClassLoader loader, String className) {
+        if (ProfFilter.isNotNeedInjectClassLoader(loader.getClass().getName())) {
+            return false;
+        }
+        if (!ProfFilter.isNeedInject(className)) {
+            return false;
+        }
+        if (ProfFilter.isNotNeedInject(className)) {
+            return false;
+        }
+        return true;
     }
 
     protected byte[] transform(String className, byte[] classfileBuffer) {
