@@ -1,98 +1,134 @@
 package com.taobao.profile.instrument;
 
+import com.taobao.profile.Manager;
+import com.taobao.profile.Profiler;
 import com.taobao.profile.config.ProfFilter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.instrument.IllegalClassFormatException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.lang.reflect.Method;
+
+import static org.objectweb.asm.Opcodes.*;
 
 public class ProfTransformerTest {
-    private byte[] emptyBytes;
+    private String className = "com/taobao/profile/instrument/TestClass";
 
     private static class MockClassLoader extends ClassLoader {
-
-    }
-
-    private static class MockClass {
+        public Class defineClass(String name, byte[] b) {
+            return defineClass(name, b, 0, b.length);
+        }
     }
 
     @Before
     public void setUp() throws Exception {
-        emptyBytes = new byte[]{};
-        ProfFilter.clear();
-    }
+        //TODO: DailyRollingFileWriter need this. need to decouple logger.
+        Manager.METHOD_LOG_PATH = "test.log";
 
-    private byte[] mockTransform(String className, byte[] classBytes) throws IllegalClassFormatException {
-        return new ProfTransformer() {
-            @Override
-            protected byte[] transform(String className, byte[] classfileBuffer) {
-                return new byte[]{1};
-            }
-        }.transform(
-                new MockClassLoader(),
-                className,
-                MockClass.class,
-                null,
-                classBytes
-        );
+        ProfFilter.clear();
+        Manager.instance().setProfileFlag(true);
     }
 
     @Test
     public void transformShouldNotWorkWhenClassIsNotIncluded() throws Exception {
-        byte[] ret = mockTransform("a", emptyBytes);
-        Assert.assertEquals(emptyBytes, ret);
+        Class transformedClass = transformTestClass();
+        Assert.assertFalse(isTestMethodInjected(transformedClass));
     }
 
     @Test
     public void transformShouldNotWorkWhenClassIsIncludedAndExcluded() throws Exception {
-        ProfFilter.addIncludeClass("a");
-        ProfFilter.addExcludeClass("a");
-        byte[] ret = mockTransform("a", emptyBytes);
-        Assert.assertEquals(emptyBytes, ret);
+        ProfFilter.addIncludeClass(className);
+        ProfFilter.addExcludeClass(className);
+        Class transformedClass = transformTestClass();
+        Assert.assertFalse(isTestMethodInjected(transformedClass));
     }
 
     @Test
-    public void transformShouldWorkWhenClassIsIncluded() throws Exception {
-        //TODO We need seperate ProfFilter, otherwise the tests failed.
-        ProfFilter.addIncludeClass("a");
-        byte[] ret = mockTransform("a", emptyBytes);
-        Assert.assertFalse(emptyBytes.equals(ret));
+    public void methodInjectionShouldWork() throws Exception {
+        ProfFilter.addIncludeClass(className);
+        Class transformedClass = transformTestClass();
+        Assert.assertTrue(isTestMethodInjected(transformedClass));
     }
 
-    @Test
-    public void transformShouldUseProfClassAdapterToTransferClass() throws Exception {
-        ClassNode cn = new ClassNode();
-        cn.name = "TestClass";
-        cn.methods.add(new MethodNode(Opcodes.ACC_PUBLIC, "testMethod", "()V", null, null));
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        cn.accept(classWriter);
-        byte[] bytes = classWriter.toByteArray();
+    private byte[] buildTestClassBytes() {
+        //TestClass
+        ClassWriter cw = new ClassWriter(0);
+        MethodVisitor mv;
 
-        ProfFilter.addIncludeClass("TestClass");
-        final AtomicBoolean isTestMethodVisited = new AtomicBoolean(false);
-        new ProfTransformer() {
-            @Override
-            protected ClassAdapter getClassAdapter(String className, ClassWriter writer) {
-                return new ClassAdapter(writer) {
-                    @Override
-                    public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings) {
-                        if ("testMethod".equals(s)) {
-                            isTestMethodVisited.getAndSet(true);
-                        }
-                        return super.visitMethod(i, s, s1, s2, strings);
-                    }
-                };
-            }
-        }.transform(new MockClassLoader(), "TestClass", null, null, bytes);
+        cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, "com/taobao/profile/instrument/TestClass", null, "java/lang/Object", null);
 
-        Assert.assertTrue(isTestMethodVisited.get());
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+            mv.visitCode();
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+            mv.visitInsn(RETURN);
+            mv.visitMaxs(1, 1);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "testMethod", "()V", null, new String[]{"java/lang/InterruptedException"});
+            mv.visitCode();
+            Label l0 = new Label();
+            Label l1 = new Label();
+            Label l2 = new Label();
+            mv.visitTryCatchBlock(l0, l1, l2, null);
+            Label l3 = new Label();
+            mv.visitTryCatchBlock(l2, l3, l2, null);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitInsn(DUP);
+            mv.visitVarInsn(ASTORE, 1);
+            mv.visitInsn(MONITORENTER);
+            mv.visitLabel(l0);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitLdcInsn(new Long(1000L));
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "wait", "(J)V");
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitInsn(MONITOREXIT);
+            mv.visitLabel(l1);
+            Label l4 = new Label();
+            mv.visitJumpInsn(GOTO, l4);
+            mv.visitLabel(l2);
+            mv.visitFrame(Opcodes.F_FULL, 2, new Object[]{"com/taobao/profile/instrument/TestClass", "java/lang/Object"}, 1, new Object[]{"java/lang/Throwable"});
+            mv.visitVarInsn(ASTORE, 2);
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitInsn(MONITOREXIT);
+            mv.visitLabel(l3);
+            mv.visitVarInsn(ALOAD, 2);
+            mv.visitInsn(ATHROW);
+            mv.visitLabel(l4);
+            mv.visitFrame(Opcodes.F_CHOP, 1, null, 0, null);
+            mv.visitInsn(RETURN);
+            mv.visitMaxs(3, 3);
+            mv.visitEnd();
+        }
+        cw.visitEnd();
+
+        return cw.toByteArray();
+    }
+
+    private Class transformTestClass() throws IllegalClassFormatException {
+        byte[] bytes = buildTestClassBytes();
+        byte[] transformedBytes = new ProfTransformer().transform(new MockClassLoader(), className, null, null, bytes);
+        Class transformedClass = new MockClassLoader().defineClass(className.replaceAll("/", "."), transformedBytes);
+        return transformedClass;
+    }
+
+    private boolean isTestMethodInjected(Class transformedClass) throws Exception {
+        Method testMethod = transformedClass.getDeclaredMethod("testMethod", new Class[]{});
+        Object instance = transformedClass.newInstance();
+        int profileCountBefore = getThreadProfileCount();
+        testMethod.invoke(instance);
+        return getThreadProfileCount() > profileCountBefore;
+    }
+
+    private int getThreadProfileCount() {
+        int threadId = (int) Thread.currentThread().getId();
+        return null == Profiler.threadProfile[threadId] ? 0 : Profiler.threadProfile[threadId].profileData.size();
     }
 }
