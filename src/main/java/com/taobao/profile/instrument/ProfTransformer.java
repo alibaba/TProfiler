@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * version 2 as published by the Free Software Foundation.
- * 
+ *
  */
 package com.taobao.profile.instrument;
 
@@ -22,7 +22,7 @@ import com.taobao.profile.config.ProfFilter;
 
 /**
  * 自定义ClassFileTransformer,用于转换类字节码
- * 
+ *
  * @author luqi
  * @since 2010-6-23
  */
@@ -33,32 +33,44 @@ public class ProfTransformer implements ClassFileTransformer {
 	 */
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 	        ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-		if (ProfFilter.IsNotNeedInjectClassLoader(loader.getClass().getName())) {
-			return classfileBuffer;
-		}
-		if (!ProfFilter.IsNeedInject(className)) {
-			return classfileBuffer;
-		}
-		if (ProfFilter.IsNotNeedInject(className)) {
-			return classfileBuffer;
-		}
-		if (Manager.instance().isDebugMode()) {
+        if (!isNeedInject(loader, className)) return classfileBuffer;
+        if (Manager.instance().isDebugMode()) {
 			System.out.println(" ---- TProfiler Debug: " + loader.getClass().getName() + " ---- " + className);
 		}
+        return transform(className, classfileBuffer);
+    }
 
-		// 记录注入类数
-		Profiler.instrumentClassCount.getAndIncrement();
-		try {
-			ClassReader reader = new ClassReader(classfileBuffer);
-			ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-			ClassAdapter adapter = new ProfClassAdapter(writer, className);
-			reader.accept(adapter, 0);
-			// 生成新类字节码
-			return writer.toByteArray();
-		} catch (Exception e) {
-			e.printStackTrace();
-			// 返回旧类字节码
-			return classfileBuffer;
-		}
-	}
+    private boolean isNeedInject(ClassLoader loader, String className) {
+        if (ProfFilter.isNotNeedInjectClassLoader(loader.getClass().getName())) {
+            return false;
+        }
+        if (!ProfFilter.isNeedInject(className)) {
+            return false;
+        }
+        if (ProfFilter.isNotNeedInject(className)) {
+            return false;
+        }
+        return true;
+    }
+
+    protected byte[] transform(String className, byte[] classfileBuffer) {
+        // 记录注入类数
+        Profiler.instrumentClassCount.getAndIncrement();
+        try {
+            ClassReader reader = new ClassReader(classfileBuffer);
+            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+            ClassAdapter adapter = getClassAdapter(className, writer);
+            reader.accept(adapter, 0);
+            // 生成新类字节码
+            return writer.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 返回旧类字节码
+            return classfileBuffer;
+        }
+    }
+
+    protected ClassAdapter getClassAdapter(String className, ClassWriter writer) {
+        return new ProfClassAdapter(writer, className);
+    }
 }

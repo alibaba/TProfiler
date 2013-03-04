@@ -54,7 +54,7 @@ public class Manager {
 	/**
 	 * 是否用纳秒采集
 	 */
-	private static boolean NEED_NANO_TIME;
+	static boolean NEED_NANO_TIME;
 	/**
 	 * 是否忽略get/set方法
 	 */

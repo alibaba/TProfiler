@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * version 2 as published by the Free Software Foundation.
- * 
+ *
  */
 package com.taobao.profile;
 
@@ -14,7 +14,7 @@ import com.taobao.profile.runtime.ThreadData;
 
 /**
  * 此类收集应用代码的运行时数据
- * 
+ *
  * @author luqi
  * @since 2010-6-23
  */
@@ -36,7 +36,7 @@ public class Profiler {
 
 	/**
 	 * 方法开始时调用,采集开始时间
-	 * 
+	 *
 	 * @param methodId
 	 */
 	public static void Start(int methodId) {
@@ -49,11 +49,7 @@ public class Profiler {
 		}
 
 		long startTime;
-		if (Manager.isNeedNanoTime()) {
-			startTime = System.nanoTime();
-		} else {
-			startTime = System.currentTimeMillis();
-		}
+		startTime = getTime();
 		try {
 			ThreadData thrData = threadProfile[(int) threadId];
 			if (thrData == null) {
@@ -72,9 +68,19 @@ public class Profiler {
 		}
 	}
 
+	private static long getTime() {
+		long time;
+		if (Manager.isNeedNanoTime()) {
+			time = System.nanoTime();
+		} else {
+			time = System.currentTimeMillis();
+		}
+		return time;
+	}
+
 	/**
 	 * 方法退出时调用,采集结束时间
-	 * 
+	 *
 	 * @param methodId
 	 */
 	public static void End(int methodId) {
@@ -87,36 +93,25 @@ public class Profiler {
 		}
 
 		long endTime;
-		if (Manager.isNeedNanoTime()) {
-			endTime = System.nanoTime();
-		} else {
-			endTime = System.currentTimeMillis();
-		}
+		endTime = getTime();
 		try {
 			ThreadData thrData = threadProfile[(int) threadId];
 			if (thrData == null || thrData.stackNum <= 0 || thrData.stackFrame.size() == 0) {
 				// 没有执行start,直接执行end/可能是异步停止导致的
 				return;
 			}
-			// 栈太深则抛弃部分数据
-			if (thrData.profileData.size() > 20000) {
-				thrData.stackNum--;
-				thrData.stackFrame.pop();
-				return;
-			}
 			thrData.stackNum--;
 			long[] frameData = thrData.stackFrame.pop();
+			// 记录太多则抛弃部分数据
+			if (thrData.profileData.size() > 20000) {
+				return;
+			}
 			long id = frameData[0];
 			if (methodId != id) {
 				return;
 			}
 			long useTime = endTime - frameData[2];
-			if (Manager.isNeedNanoTime()) {
-				if (useTime > 500000) {
-					frameData[2] = useTime;
-					thrData.profileData.push(frameData);
-				}
-			} else if (useTime > 1) {
+			if (Manager.isNeedNanoTime() ? useTime > 500000 : useTime > 1) {
 				frameData[2] = useTime;
 				thrData.profileData.push(frameData);
 			}

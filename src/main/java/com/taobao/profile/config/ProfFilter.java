@@ -75,7 +75,7 @@ public class ProfFilter {
 	 * @param className
 	 * @return
 	 */
-	public static boolean IsNeedInject(String className) {
+	public static boolean isNeedInject(String className) {
 		String icaseName = className.toLowerCase().replace('.', '/');
 		for (String v : includePackage) {
 			if (icaseName.startsWith(v)) {
@@ -91,7 +91,7 @@ public class ProfFilter {
 	 * @param className
 	 * @return
 	 */
-	public static boolean IsNotNeedInject(String className) {
+	public static boolean isNotNeedInject(String className) {
 		String icaseName = className.toLowerCase().replace('.', '/');
 		for (String v : excludePackage) {
 			if (icaseName.startsWith(v)) {
@@ -107,7 +107,7 @@ public class ProfFilter {
 	 * @param classLoader
 	 * @return
 	 */
-	public static boolean IsNotNeedInjectClassLoader(String classLoader) {
+	public static boolean isNotNeedInjectClassLoader(String classLoader) {
 		for (String v : excludeClassLoader) {
 			if (classLoader.equals(v)) {
 				return true;
@@ -115,4 +115,12 @@ public class ProfFilter {
 		}
 		return false;
 	}
+
+    public static void clear() {
+        //TODO this is for test teardown, and should be removed when ProfFilter is separated
+        includePackage.clear();
+        excludePackage.clear();
+        excludeClassLoader.clear();
+    }
+
 }
