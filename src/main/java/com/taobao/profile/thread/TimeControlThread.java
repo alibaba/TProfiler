@@ -31,11 +31,11 @@ public class TimeControlThread extends Thread {
 	/**
 	 * 
 	 */
-	private InnerControTime startTime;
+	private InnerControlTime startTime;
 	/**
 	 * 
 	 */
-	private InnerControTime endTime;
+	private InnerControlTime endTime;
 
 	/**
 	 * @param start
@@ -50,7 +50,7 @@ public class TimeControlThread extends Thread {
 	 * @param time
 	 * @return
 	 */
-	public long waitTime(InnerControTime time) {
+	public long waitTime(InnerControlTime time) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.HOUR_OF_DAY, time.getHour());
 		cal.set(Calendar.MINUTE, time.getMinute());
@@ -64,7 +64,7 @@ public class TimeControlThread extends Thread {
 	 * @param time
 	 * @return
 	 */
-	public long nextStartTime(InnerControTime time) {
+	public long nextStartTime(InnerControlTime time) {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_MONTH, 1);
 		cal.set(Calendar.HOUR_OF_DAY, time.getHour());
@@ -128,7 +128,7 @@ public class TimeControlThread extends Thread {
 	 * @param time
 	 * @return
 	 */
-	public InnerControTime parse(String time) {
+	public InnerControlTime parse(String time) {
 		if (time == null) {
 			return null;
 		} else {
@@ -139,7 +139,7 @@ public class TimeControlThread extends Thread {
 					int hour = Integer.valueOf(_time[0]);
 					int minute = Integer.valueOf(_time[1]);
 					int second = Integer.valueOf(_time[2]);
-					InnerControTime inner = new InnerControTime();
+					InnerControlTime inner = new InnerControlTime();
 					inner.setHour(hour);
 					inner.setMinute(minute);
 					inner.setSecond(second);
@@ -158,7 +158,7 @@ public class TimeControlThread extends Thread {
 	 * @author shutong.dy
 	 * @since 2012-1-12
 	 */
-	private class InnerControTime {
+	private class InnerControlTime {
 		private int hour;
 		private int minute;
 		private int second;
