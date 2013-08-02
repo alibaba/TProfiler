@@ -79,7 +79,7 @@ public class DailyRollingFileWriter {
 				rolling(now);
 			}
 		} else {
-			createWriter(filePath);
+			createWriter(file);
 		}
 	}
 
@@ -164,7 +164,7 @@ public class DailyRollingFileWriter {
 
 		File file = new File(fileName);
 		file.renameTo(target);
-		createWriter(fileName);
+		createWriter(new File(fileName));
 		rollingFileName = datedFilename;
 	}
 
@@ -183,11 +183,16 @@ public class DailyRollingFileWriter {
 
 	/**
 	 * 直接覆盖旧文件
-	 * @param filename
+	 * @param file
 	 */
-	private void createWriter(String filename) {
+	private void createWriter(File file) {
 		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(filename), 8 * 1024);
+            file = file.getCanonicalFile();
+            File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
+			bufferedWriter = new BufferedWriter(new FileWriter(file), 8 * 1024);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
