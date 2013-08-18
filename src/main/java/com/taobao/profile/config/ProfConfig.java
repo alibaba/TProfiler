@@ -102,17 +102,36 @@ public class ProfConfig {
 	 * 构造方法
 	 */
 	public ProfConfig(String defaultPath) {
-		String configPath = System.getProperty("profile.properties");
-		if (configPath == null || configPath.isEmpty()) {
-			parse(defaultPath);
-		} else {
-			File file = new File(configPath);
-			if (file.exists()) {
-				parseProperty(file);
-			} else {
-				parse(defaultPath);
-			}
+	  
+	  boolean debug = "true".equalsIgnoreCase(System.getProperty("tprofiler.debug")); 
+	  /*
+	   * 查找顺序：
+	   * 1. 系统参数-Dprofile.properties=/path/profile.properties
+	   * 2. 当前文件夹下的profile.properties
+	   * 3. 有户文件夹~/.tprofiler/profile.properties，如：/home/manlge/.tprofiler/profile.properties
+	   * 4. 默认jar包中的profile.properties
+	   */
+	  String configPaths[] = {System.getProperty("profile.properties"), 
+	                          "profile.properties", 
+	                          new File(System.getProperty("user.home"), "/.tprofiler/profile.properties").getAbsolutePath()};
+	  
+		for (String configPath : configPaths){
+	    if (configPath != null && !configPath.isEmpty()) {
+	      File file = new File(configPath);
+	      if (file.exists()) {
+	        if (debug){
+	          System.out.println(String.format("load configuration from \"%s\".", file.getAbsolutePath()));
+	        }
+	        parseProperty(file);
+	        return;
+	      }
+	    }
 		}
+		//加载默认配置
+    if (debug){
+      System.out.println(String.format("load configuration from \"%s\".", Thread.currentThread().getContextClassLoader().getResource(defaultPath)));
+    }
+    parse(defaultPath);
 	}
 
 	/**
