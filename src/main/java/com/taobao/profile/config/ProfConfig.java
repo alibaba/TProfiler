@@ -13,7 +13,6 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.taobao.profile.utils.Utilities;
 import com.taobao.profile.utils.VariableNotFoundException;
 
 /**
@@ -125,7 +124,7 @@ public class ProfConfig {
 		Properties resource = new Properties();
 		try {
 			resource.load(new FileReader(path));
-			loadConfig(resource);
+			loadConfig(new ConfigureProperties(resource, System.getProperties()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -134,15 +133,13 @@ public class ProfConfig {
   /**
    * 加载配置
    * @param properties
-   * @throws ParseException 
    */
   private void loadConfig(Properties properties) throws VariableNotFoundException {
-    Properties context = System.getProperties();    
     String startProfTime = properties.getProperty("startProfTime");
     String endProfTime = properties.getProperty("endProfTime");
-    String logFilePath = Utilities.repleseVariables(properties.getProperty("logFilePath"), context) ;
-    String methodFilePath = Utilities.repleseVariables(properties.getProperty("methodFilePath"), context) ;
-    String samplerFilePath = Utilities.repleseVariables(properties.getProperty("samplerFilePath"), context) ;
+    String logFilePath = properties.getProperty("logFilePath");
+    String methodFilePath = properties.getProperty("methodFilePath");
+    String samplerFilePath = properties.getProperty("samplerFilePath");
     String includePackageStartsWith = properties.getProperty("includePackageStartsWith");
     String eachProfUseTime = properties.getProperty("eachProfUseTime");
     String eachProfIntervalTime = properties.getProperty("eachProfIntervalTime");
@@ -193,7 +190,7 @@ public class ProfConfig {
 			try{
 			  Properties properties = new Properties();
 			  properties.load(in);
-			  loadConfig(properties);
+			  loadConfig(new ConfigureProperties(properties, System.getProperties()));
 			} finally{
 			  in.close();
 			}
