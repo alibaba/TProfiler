@@ -29,7 +29,7 @@ public class Manager {
 	/**
 	 * 默认配置文件
 	 */
-	private static final String DEFAULT_CONFIG = "profile";
+	private static final String DEFAULT_CONFIG = "profile.properties";
 
 	/**
 	 * 远程连接端口

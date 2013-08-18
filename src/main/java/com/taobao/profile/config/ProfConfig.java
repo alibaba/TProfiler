@@ -9,11 +9,12 @@
 package com.taobao.profile.config;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
-import java.util.ResourceBundle;
+
+import com.taobao.profile.utils.Utilities;
+import com.taobao.profile.utils.VariableNotFoundException;
 
 /**
  * 读取并保存配置
@@ -121,58 +122,65 @@ public class ProfConfig {
 	 * @param path
 	 */
 	private void parseProperty(File path) {
-
 		Properties resource = new Properties();
 		try {
 			resource.load(new FileReader(path));
-			String startProfTime = resource.getProperty("startProfTime");
-			String endProfTime = resource.getProperty("endProfTime");
-			String logFilePath = resource.getProperty("logFilePath");
-			String methodFilePath = resource.getProperty("methodFilePath");
-			String samplerFilePath = resource.getProperty("samplerFilePath");
-			String includePackageStartsWith = resource.getProperty("includePackageStartsWith");
-			String eachProfUseTime = resource.getProperty("eachProfUseTime");
-			String eachProfIntervalTime = resource.getProperty("eachProfIntervalTime");
-			String samplerIntervalTime = resource.getProperty("samplerIntervalTime");
-			String excludePackageStartsWith = resource.getProperty("excludePackageStartsWith");
-			String needNanoTime = resource.getProperty("needNanoTime");
-			String ignoreGetSetMethod = resource.getProperty("ignoreGetSetMethod");
-			String excludeClassLoader = resource.getProperty("excludeClassLoader");
-			String debugMode = resource.getProperty("debugMode");
-            String port = resource.getProperty("port");
-            setPort(port == null ? 50000 : Integer.valueOf(port));
-			setDebugMode("true".equals(debugMode));
-			setExcludeClassLoader(excludeClassLoader);
-			setExcludePackageStartsWith(excludePackageStartsWith);
-			setEndProfTime(endProfTime);
-			setIncludePackageStartsWith(includePackageStartsWith);
-			setLogFilePath(logFilePath);
-			setMethodFilePath(methodFilePath);
-			setSamplerFilePath(samplerFilePath);
-			setStartProfTime(startProfTime);
-			setNeedNanoTime("true".equals(needNanoTime));
-			setIgnoreGetSetMethod("true".equals(ignoreGetSetMethod));
-			if (eachProfUseTime == null) {
-				setEachProfUseTime(5);
-			} else {
-				setEachProfUseTime(Integer.valueOf(eachProfUseTime.trim()));
-			}
-			if (eachProfIntervalTime == null) {
-				setEachProfIntervalTime(50);
-			} else {
-				setEachProfIntervalTime(Integer.valueOf(eachProfIntervalTime.trim()));
-			}
-			if (samplerIntervalTime == null) {
-				setSamplerIntervalTime(10);
-			} else {
-				setSamplerIntervalTime(Integer.valueOf(samplerIntervalTime.trim()));
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+			loadConfig(resource);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+  /**
+   * 加载配置
+   * @param properties
+   * @throws ParseException 
+   */
+  private void loadConfig(Properties properties) throws VariableNotFoundException {
+    Properties context = System.getProperties();    
+    String startProfTime = properties.getProperty("startProfTime");
+    String endProfTime = properties.getProperty("endProfTime");
+    String logFilePath = Utilities.repleseVariables(properties.getProperty("logFilePath"), context) ;
+    String methodFilePath = Utilities.repleseVariables(properties.getProperty("methodFilePath"), context) ;
+    String samplerFilePath = Utilities.repleseVariables(properties.getProperty("samplerFilePath"), context) ;
+    String includePackageStartsWith = properties.getProperty("includePackageStartsWith");
+    String eachProfUseTime = properties.getProperty("eachProfUseTime");
+    String eachProfIntervalTime = properties.getProperty("eachProfIntervalTime");
+    String samplerIntervalTime = properties.getProperty("samplerIntervalTime");
+    String excludePackageStartsWith = properties.getProperty("excludePackageStartsWith");
+    String needNanoTime = properties.getProperty("needNanoTime");
+    String ignoreGetSetMethod = properties.getProperty("ignoreGetSetMethod");
+    String excludeClassLoader = properties.getProperty("excludeClassLoader");
+    String debugMode = properties.getProperty("debugMode");
+          String port = properties.getProperty("port");
+          setPort(port == null ? 50000 : Integer.valueOf(port));
+    setDebugMode("true".equals(debugMode));
+    setExcludeClassLoader(excludeClassLoader);
+    setExcludePackageStartsWith(excludePackageStartsWith);
+    setEndProfTime(endProfTime);
+    setIncludePackageStartsWith(includePackageStartsWith);
+    setLogFilePath(logFilePath);
+    setMethodFilePath(methodFilePath);
+    setSamplerFilePath(samplerFilePath);
+    setStartProfTime(startProfTime);
+    setNeedNanoTime("true".equals(needNanoTime));
+    setIgnoreGetSetMethod("true".equals(ignoreGetSetMethod));
+    if (eachProfUseTime == null) {
+    	setEachProfUseTime(5);
+    } else {
+    	setEachProfUseTime(Integer.valueOf(eachProfUseTime.trim()));
+    }
+    if (eachProfIntervalTime == null) {
+    	setEachProfIntervalTime(50);
+    } else {
+    	setEachProfIntervalTime(Integer.valueOf(eachProfIntervalTime.trim()));
+    }
+    if (samplerIntervalTime == null) {
+    	setSamplerIntervalTime(10);
+    } else {
+    	setSamplerIntervalTime(Integer.valueOf(samplerIntervalTime.trim()));
+    }
+  }
 
 	/**
 	 * 解析默认配置文件
@@ -181,48 +189,13 @@ public class ProfConfig {
 	 */
 	private void parse(String configName) {
 		try {
-			ResourceBundle resource = ResourceBundle.getBundle(configName);
-			String startProfTime = resource.getString("startProfTime");
-			String endProfTime = resource.getString("endProfTime");
-			String logFilePath = resource.getString("logFilePath");
-			String methodFilePath = resource.getString("methodFilePath");
-			String samplerFilePath = resource.getString("samplerFilePath");
-			String includePackageStartsWith = resource.getString("includePackageStartsWith");
-			String eachProfUseTime = resource.getString("eachProfUseTime");
-			String eachProfIntervalTime = resource.getString("eachProfIntervalTime");
-			String samplerIntervalTime = resource.getString("samplerIntervalTime");
-			String excludePackageStartsWith = resource.getString("excludePackageStartsWith");
-			String needNanoTime = resource.getString("needNanoTime");
-			String ignoreGetSetMethod = resource.getString("ignoreGetSetMethod");
-			String excludeClassLoader = resource.getString("excludeClassLoader");
-			String debugMode = resource.getString("debugMode");
-            String port = resource.getString("port");
-            setPort(port == null ? 50000 : Integer.valueOf(port));
-			setDebugMode("true".equals(debugMode));
-			setExcludeClassLoader(excludeClassLoader);
-			setExcludePackageStartsWith(excludePackageStartsWith);
-			setEndProfTime(endProfTime);
-			setIncludePackageStartsWith(includePackageStartsWith);
-			setLogFilePath(logFilePath);
-			setMethodFilePath(methodFilePath);
-			setSamplerFilePath(samplerFilePath);
-			setStartProfTime(startProfTime);
-			setNeedNanoTime("true".equals(needNanoTime));
-			setIgnoreGetSetMethod("true".equals(ignoreGetSetMethod));
-			if (eachProfUseTime == null) {
-				setEachProfUseTime(5);
-			} else {
-				setEachProfUseTime(Integer.valueOf(eachProfUseTime.trim()));
-			}
-			if (eachProfIntervalTime == null) {
-				setEachProfIntervalTime(50);
-			} else {
-				setEachProfIntervalTime(Integer.valueOf(eachProfIntervalTime.trim()));
-			}
-			if (samplerIntervalTime == null) {
-				setSamplerIntervalTime(10);
-			} else {
-				setSamplerIntervalTime(Integer.valueOf(samplerIntervalTime.trim()));
+			InputStream in = getClass().getResourceAsStream("/" + configName);
+			try{
+			  Properties properties = new Properties();
+			  properties.load(in);
+			  loadConfig(properties);
+			} finally{
+			  in.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
