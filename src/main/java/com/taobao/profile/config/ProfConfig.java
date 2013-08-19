@@ -8,9 +8,13 @@
  */
 package com.taobao.profile.config;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import com.taobao.profile.utils.VariableNotFoundException;
@@ -22,6 +26,17 @@ import com.taobao.profile.utils.VariableNotFoundException;
  * @since 2010-6-22
  */
 public class ProfConfig {
+  
+  /**
+   * 配置文件名
+   */
+  private static final String CONFIG_FILE_NAME = "profile.properties";
+
+  /**
+   * 默认的配置文件路径
+   */
+  private File DEFAULT_PROFILE_PATH = new File(System.getProperty("user.home"), "/.tprofiler/" + CONFIG_FILE_NAME);
+
 
 	/**
 	 * 开始profile时间
@@ -101,7 +116,7 @@ public class ProfConfig {
 	/**
 	 * 构造方法
 	 */
-	public ProfConfig(String defaultPath) {
+	public ProfConfig() {
 	  
 	  boolean debug = "true".equalsIgnoreCase(System.getProperty("tprofiler.debug")); 
 	  /*
@@ -111,39 +126,70 @@ public class ProfConfig {
 	   * 3. 有户文件夹~/.tprofiler/profile.properties，如：/home/manlge/.tprofiler/profile.properties
 	   * 4. 默认jar包中的profile.properties
 	   */
-	  String configPaths[] = {System.getProperty("profile.properties"), 
-	                          "profile.properties", 
-	                          new File(System.getProperty("user.home"), "/.tprofiler/profile.properties").getAbsolutePath()};
+    File configFiles[] = {
+                            new File(System.getProperty(CONFIG_FILE_NAME)), 
+	                          new File(CONFIG_FILE_NAME), 
+	                          DEFAULT_PROFILE_PATH
+	                          };
 	  
-		for (String configPath : configPaths){
-	    if (configPath != null && !configPath.isEmpty()) {
-	      File file = new File(configPath);
-	      if (file.exists()) {
-	        if (debug){
-	          System.out.println(String.format("load configuration from \"%s\".", file.getAbsolutePath()));
-	        }
-	        parseProperty(file);
-	        return;
-	      }
+		for (File file : configFiles){
+	    if (file.exists() && file.isFile()) {
+        if (debug){
+          System.out.println(String.format("load configuration from \"%s\".", file.getAbsolutePath()));
+        }
+        parseProperty(file);
+        return;
 	    }
 		}
 		//加载默认配置
     if (debug){
-      System.out.println(String.format("load configuration from \"%s\".", Thread.currentThread().getContextClassLoader().getResource(defaultPath)));
+      System.out.println(String.format("load configuration from \"%s\".", DEFAULT_PROFILE_PATH.getAbsolutePath()));
     }
-    parse(defaultPath);
+    try {
+      extractDefaultProFile();
+      parseProperty(DEFAULT_PROFILE_PATH);
+    } catch (IOException e) {
+      throw new RuntimeException("error load config file", e);
+    }
+    
 	}
 
 	/**
+	 * 解压默认的配置文件到~/.tprofiler/profile.properties，可以作为模板，以便用户编辑
+	 * @throws IOException
+	 */
+	private void extractDefaultProFile() throws IOException {
+    InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_NAME);
+    OutputStream out = null;
+    try{
+      File profileDirectory = DEFAULT_PROFILE_PATH.getParentFile();
+      if (!profileDirectory.exists()){
+        profileDirectory.mkdirs();
+      }
+      out = new BufferedOutputStream(new FileOutputStream(DEFAULT_PROFILE_PATH));
+      byte[] buffer = new byte[1024];
+      for (int len = -1; (len = in.read(buffer)) != -1;){
+        out.write(buffer, 0, len);
+      }
+      
+    }finally{
+      in.close();
+      out.close();
+    }
+  }
+
+  /**
 	 * 解析用户自定义配置文件
-	 * 
 	 * @param path
 	 */
 	private void parseProperty(File path) {
-		Properties resource = new Properties();
+		Properties properties = new Properties();
 		try {
-			resource.load(new FileReader(path));
-			loadConfig(new ConfigureProperties(resource, System.getProperties()));
+			properties.load(new FileReader(path));
+			Properties context = new Properties(); 
+			context.putAll(System.getProperties());
+			context.putAll(properties);
+      loadConfig(new ConfigureProperties(properties, context));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -198,25 +244,6 @@ public class ProfConfig {
     }
   }
 
-	/**
-	 * 解析默认配置文件
-	 * 
-	 * @param configName
-	 */
-	private void parse(String configName) {
-		try {
-			InputStream in = getClass().getResourceAsStream("/" + configName);
-			try{
-			  Properties properties = new Properties();
-			  properties.load(in);
-			  loadConfig(new ConfigureProperties(properties, System.getProperties()));
-			} finally{
-			  in.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * @return
