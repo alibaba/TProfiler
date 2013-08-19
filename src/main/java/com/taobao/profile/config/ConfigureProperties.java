@@ -18,9 +18,51 @@ import com.taobao.profile.utils.Utilities;
 import com.taobao.profile.utils.VariableNotFoundException;
 
 /**
- * 用于加载配置文件的properties类，与java默认的不同，在调用get方法返回value时，会对value
+ * <p>用于加载配置文件的properties类，与java默认的不同，在调用get方法返回value时，会对value
  * 会检查是否存在变量(如：${user.home})，如果存在，会将变量替换成具体的值。
- * 该类使用dectorator设计模式
+ * <p>该类使用dectorator设计模式
+ * 
+ * <p>示例文件内容(profile.properties)：
+ * <pre>
+ *   logFileName = tprofiler.log
+ *   methodFileName = tmethod.log
+ *   samplerFileName = tsampler.log
+ *   
+ *   startProfTime = 9:00:00
+ *   endProfTime = 11:00:00
+ *   eachProfUseTime = 5
+ *   eachProfIntervalTime = 50
+ *   samplerIntervalTime = 20
+ *   port = 50000
+ *   debugMode = false
+ *   needNanoTime = false
+ *   ignoreGetSetMethod = true
+ *   
+ *   logFilePath = ${user.home}/logs/${logFileName}
+ *   methodFilePath = ${user.home}/logs/${methodFileName}
+ *   samplerFilePath = ${user.home}/logs/${samplerFileName}
+ *   
+ *   excludeClassLoader = org.eclipse.osgi.internal.baseadaptor.DefaultClassLoader
+ *   includePackageStartsWith = com.taobao;com.taobao.common
+ *   excludePackageStartsWith = com.taobao.sketch;org.apache.velocity;com.alibaba;com.taobao.forest.domain.dataobject
+ * </pre>
+ * <p>未例代码：
+ * <pre>
+ *   Properties properties = new Properties();
+ *   InputStream in = getClass().getClassLoader().getResourceAsStream("profile.properties");
+ *   properties.load(in);
+ *
+ *   Properties context = new Properties(System.getProperties());
+ *   context.putAll(System.getProperties());
+ *   context.putAll(properties);
+ *   try{
+ *     ConfigureProperties configureProperties = new ConfigureProperties(properties, context);
+ *     String logFilePath = configureProperties.getProperty("logFilePath");
+ *     Assert.assertEquals(logFilePath, System.getProperty("user.home") + "/logs/tprofiler.log");
+ *   }finally{
+ *     in.close();
+ *   }
+ * </pre>
  * @author manlge
  * @since 2013-08-18
  */
