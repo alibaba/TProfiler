@@ -119,7 +119,7 @@ public class ProfConfig {
 	 */
 	public ProfConfig() {
 	  
-	  //此时配置文件中的debug参数还未读取，因些使用-Dtprofiler.debug=true来读取，用于开发时调试
+	  //此时配置文件中的debug参数还未读取，因此使用-Dtprofiler.debug=true来读取，用于开发时调试
 	  boolean debug = "true".equalsIgnoreCase(System.getProperty("tprofiler.debug")); 
 	  /*
 	   * 查找顺序：
