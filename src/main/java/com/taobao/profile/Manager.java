@@ -26,10 +26,6 @@ import com.taobao.profile.thread.TimeControlThread;
  * @since 2012-1-9
  */
 public class Manager {
-	/**
-	 * 默认配置文件
-	 */
-	private static final String DEFAULT_CONFIG = "profile";
 
 	/**
 	 * 远程连接端口
@@ -121,7 +117,7 @@ public class Manager {
 	 * 初始化配置
 	 */
 	public void initialization() {
-		profConfig = new ProfConfig(DEFAULT_CONFIG);
+		profConfig = new ProfConfig();
 		NEED_NANO_TIME = profConfig.isNeedNanoTime();
 		IGNORE_GETSET_METHOD = profConfig.isIgnoreGetSetMethod();
 		METHOD_LOG_PATH = profConfig.getMethodFilePath();
