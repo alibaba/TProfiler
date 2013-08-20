@@ -8,6 +8,7 @@
  */
 package com.taobao.profile.config;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,7 +34,7 @@ public class ProfConfig {
   private static final String CONFIG_FILE_NAME = "profile.properties";
 
   /**
-   * 默认的配置文件路径
+   * 默认的配置文件路径，~/.tprofiler/profile.properties
    */
   private File DEFAULT_PROFILE_PATH = new File(System.getProperty("user.home"), "/.tprofiler/" + CONFIG_FILE_NAME);
 
@@ -118,12 +119,13 @@ public class ProfConfig {
 	 */
 	public ProfConfig() {
 	  
+	  //此时配置文件中的debug参数还未读取，因些使用-Dtprofiler.debug=true来读取，用于开发时调试
 	  boolean debug = "true".equalsIgnoreCase(System.getProperty("tprofiler.debug")); 
 	  /*
 	   * 查找顺序：
 	   * 1. 系统参数-Dprofile.properties=/path/profile.properties
 	   * 2. 当前文件夹下的profile.properties
-	   * 3. 有户文件夹~/.tprofiler/profile.properties，如：/home/manlge/.tprofiler/profile.properties
+	   * 3. 用户文件夹~/.tprofiler/profile.properties，如：/home/manlge/.tprofiler/profile.properties
 	   * 4. 默认jar包中的profile.properties
 	   */
     File configFiles[] = {
@@ -146,20 +148,25 @@ public class ProfConfig {
       System.out.println(String.format("load configuration from \"%s\".", DEFAULT_PROFILE_PATH.getAbsolutePath()));
     }
     try {
-      extractDefaultProFile();
+      extractDefaultProfile();
       parseProperty(DEFAULT_PROFILE_PATH);
     } catch (IOException e) {
-      throw new RuntimeException("error load config file", e);
+      throw new RuntimeException("error load config file " + DEFAULT_PROFILE_PATH, e);
     }
     
 	}
 
 	/**
-	 * 解压默认的配置文件到~/.tprofiler/profile.properties，可以作为模板，以便用户编辑
+	 * 解压默认的配置文件到~/.tprofiler/profile.properties，作为模板，以便用户编辑
 	 * @throws IOException
 	 */
-	private void extractDefaultProFile() throws IOException {
-    InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_NAME);
+	private void extractDefaultProfile() throws IOException {
+	  /*
+	   * 这里采用stream进行复制，而不是采用properties.load和save，主要原因为以下2点：
+	   * 1. 性能，stream直接复制快，没有properties解析过程(不过文件较小，解析开销可以忽略)
+	   * 2. properties会造成注释丢失，该文件作为模板提供给用户，包含注释信息
+	   */
+    InputStream in = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_NAME));
     OutputStream out = null;
     try{
       File profileDirectory = DEFAULT_PROFILE_PATH.getParentFile();
@@ -171,7 +178,6 @@ public class ProfConfig {
       for (int len = -1; (len = in.read(buffer)) != -1;){
         out.write(buffer, 0, len);
       }
-      
     }finally{
       in.close();
       out.close();
@@ -185,10 +191,14 @@ public class ProfConfig {
 	private void parseProperty(File path) {
 		Properties properties = new Properties();
 		try {
-			properties.load(new FileReader(path));
+			properties.load(new FileReader(path)); //配置文件原始内容，未进行变量替换
+			
+			//变量查找上下文，采用System.properties和配置文件集合
 			Properties context = new Properties(); 
 			context.putAll(System.getProperties());
 			context.putAll(properties);
+			
+			//加载配置
       loadConfig(new ConfigureProperties(properties, context));
 		} catch (Exception e) {
 			e.printStackTrace();
