@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.taobao</groupId>
 	<artifactId>tprofiler</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>profile</name>
 	<packaging>jar</packaging>
 	<dependencies>
@@ -47,6 +47,7 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<outputDirectory>dist/TProfiler/lib</outputDirectory>
 					<archive>
 						<manifestEntries>
 							<Premain-Class>com.taobao.profile.Main</Premain-Class>
