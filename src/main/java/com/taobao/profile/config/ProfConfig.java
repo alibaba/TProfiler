@@ -128,32 +128,33 @@ public class ProfConfig {
 	   * 3. 用户文件夹~/.tprofiler/profile.properties，如：/home/manlge/.tprofiler/profile.properties
 	   * 4. 默认jar包中的profile.properties
 	   */
-    File configFiles[] = {
-                            new File(System.getProperty(CONFIG_FILE_NAME)), 
-	                          new File(CONFIG_FILE_NAME), 
-	                          DEFAULT_PROFILE_PATH
-	                          };
-	  
-		for (File file : configFiles){
-	    if (file.exists() && file.isFile()) {
-        if (debug){
-          System.out.println(String.format("load configuration from \"%s\".", file.getAbsolutePath()));
-        }
-        parseProperty(file);
-        return;
-	    }
-		}
+	  String specifiedConfigFileName = System.getProperty(CONFIG_FILE_NAME);
+	  File configFiles[] = {
+			  specifiedConfigFileName == null ? null : new File(specifiedConfigFileName), 
+					  new File(CONFIG_FILE_NAME), 
+					  DEFAULT_PROFILE_PATH
+	  };
+
+	  for (File file : configFiles){
+		  if (file != null && file.exists() && file.isFile()) {
+			  if (debug){
+				  System.out.println(String.format("load configuration from \"%s\".", file.getAbsolutePath()));
+			  }
+			  parseProperty(file);
+			  return;
+		  }
+	  }
 		//加载默认配置
     if (debug){
       System.out.println(String.format("load configuration from \"%s\".", DEFAULT_PROFILE_PATH.getAbsolutePath()));
     }
     try {
-      extractDefaultProfile();
-      parseProperty(DEFAULT_PROFILE_PATH);
+    	extractDefaultProfile();
+    	parseProperty(DEFAULT_PROFILE_PATH);
     } catch (IOException e) {
-      throw new RuntimeException("error load config file " + DEFAULT_PROFILE_PATH, e);
+    	throw new RuntimeException("error load config file " + DEFAULT_PROFILE_PATH, e);
     }
-    
+
 	}
 
 	/**
