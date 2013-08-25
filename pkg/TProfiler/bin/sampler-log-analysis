@@ -1,0 +1,7 @@
+#!/bin/sh
+
+. $(dirname $0)/common-env
+
+MAIN_CLASS=com.taobao.profile.analysis.SamplerLogAnalysis
+
+exec "$JAVACMD" -classpath $CLASS_PATH $MAIN_CLASS "$@"
