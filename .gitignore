@@ -3,3 +3,7 @@
 .settings
 .project
 .classpath
+*.jar
+pkg/TProfiler/COPYING.txt
+pkg/TProfiler/README
+pkg/TProfiler/profile.properties

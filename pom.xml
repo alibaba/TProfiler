@@ -47,7 +47,7 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<outputDirectory>dist/TProfiler/lib</outputDirectory>
+					<outputDirectory>pkg/TProfiler/lib</outputDirectory>
 					<archive>
 						<manifestEntries>
 							<Premain-Class>com.taobao.profile.Main</Premain-Class>
