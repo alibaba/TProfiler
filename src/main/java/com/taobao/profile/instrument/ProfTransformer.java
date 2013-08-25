@@ -33,7 +33,7 @@ public class ProfTransformer implements ClassFileTransformer {
 	 */
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 	        ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-		if (ProfFilter.isNotNeedInjectClassLoader(loader.getClass().getName())) {
+		if (loader != null && ProfFilter.isNotNeedInjectClassLoader(loader.getClass().getName())) {
 			return classfileBuffer;
 		}
 		if (!ProfFilter.isNeedInject(className)) {
@@ -43,7 +43,7 @@ public class ProfTransformer implements ClassFileTransformer {
 			return classfileBuffer;
 		}
 		if (Manager.instance().isDebugMode()) {
-			System.out.println(" ---- TProfiler Debug: " + loader.getClass().getName() + " ---- " + className);
+			System.out.println(" ---- TProfiler Debug: ClassLoader:" + loader + " ---- class: " + className);
 		}
 
 		// 记录注入类数

@@ -225,9 +225,9 @@ public class ProfConfig {
     String ignoreGetSetMethod = properties.getProperty("ignoreGetSetMethod");
     String excludeClassLoader = properties.getProperty("excludeClassLoader");
     String debugMode = properties.getProperty("debugMode");
-          String port = properties.getProperty("port");
-          setPort(port == null ? 50000 : Integer.valueOf(port));
-    setDebugMode("true".equals(debugMode));
+    String port = properties.getProperty("port");
+    setPort(port == null ? 50000 : Integer.valueOf(port));
+    setDebugMode("true".equalsIgnoreCase(debugMode == null ? null : debugMode.trim()));
     setExcludeClassLoader(excludeClassLoader);
     setExcludePackageStartsWith(excludePackageStartsWith);
     setEndProfTime(endProfTime);
