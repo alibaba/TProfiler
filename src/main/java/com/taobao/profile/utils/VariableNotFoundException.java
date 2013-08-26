@@ -11,11 +11,6 @@ public class VariableNotFoundException extends Exception {
     super();
   }
 
-  public VariableNotFoundException(String message, Throwable cause,
-    boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
-
   public VariableNotFoundException(String message, Throwable cause) {
     super(message, cause);
   }
