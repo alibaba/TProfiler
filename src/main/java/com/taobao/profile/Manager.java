@@ -8,16 +8,16 @@
  */
 package com.taobao.profile;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.taobao.profile.config.ProfConfig;
 import com.taobao.profile.config.ProfFilter;
 import com.taobao.profile.thread.DataDumpThread;
 import com.taobao.profile.thread.InnerSocketThread;
 import com.taobao.profile.thread.SamplerThread;
 import com.taobao.profile.thread.TimeControlThread;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * 管理类,单例实现
@@ -124,7 +124,7 @@ public class Manager {
 		// 判断启动时间是否大于采集结束时间 2012-05-25
 		DateFormat df = new SimpleDateFormat("HH:mm:ss");
 		String now = df.format(new Date());
-		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 ) ? true : false;
+		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 );
 		isDebugMode = profConfig.isDebugMode();
         PORT = profConfig.getPort();
 
