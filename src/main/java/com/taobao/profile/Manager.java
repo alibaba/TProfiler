@@ -124,7 +124,7 @@ public class Manager {
 		// 判断启动时间是否大于采集结束时间 2012-05-25
 		DateFormat df = new SimpleDateFormat("HH:mm:ss");
 		String now = df.format(new Date());
-		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 ) ? true : false;
+		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 );
 		isDebugMode = profConfig.isDebugMode();
         PORT = profConfig.getPort();
 
