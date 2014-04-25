@@ -55,7 +55,7 @@ public class ProfTransformer implements ClassFileTransformer {
 			reader.accept(adapter, 0);
 			// 生成新类字节码
 			return writer.toByteArray();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			// 返回旧类字节码
 			return classfileBuffer;
