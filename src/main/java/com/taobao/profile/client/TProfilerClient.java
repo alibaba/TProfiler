@@ -142,8 +142,9 @@ public class TProfilerClient {
 	private static String read(InputStream in) throws IOException {
 		BufferedInputStream bin = new BufferedInputStream(in);
 		StringBuffer sb = new StringBuffer();
-		while (true) {
-			char c = (char) bin.read();
+        int i;
+		while ((i = bin.read()) != -1) {
+			char c = (char) i;
 			if (c == '\r') {
 				break;
 			} else {

@@ -83,8 +83,9 @@ public class InnerSocketThread extends Thread {
 	private String read(InputStream in) throws IOException {
 		BufferedInputStream bin = new BufferedInputStream(in);
 		StringBuffer sb = new StringBuffer();
-		while (true) {
-			char c = (char) bin.read();
+        int i;
+		while ((i = bin.read()) != -1) {
+			char c = (char) i;
 			if (c == '\r') {
 				break;
 			} else {
@@ -110,4 +111,15 @@ public class InnerSocketThread extends Thread {
 		out.write('\r');
 		out.flush();
 	}
+
+    /**
+     * 调试使用
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        InnerSocketThread socketThread = new InnerSocketThread();
+        socketThread.setName("TProfiler-InnerSocket-Debug");
+        socketThread.start();
+    }
 }
