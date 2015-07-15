@@ -106,7 +106,7 @@ public class DataDumpThread extends Thread {
 		for (int index = 0; index < threadData.length; index++) {
 			ThreadData profilerData = threadData[index];
 			if (profilerData == null) {
-				continue;
+		c		continue;
 			}
 			ProfStack<long[]> profile = profilerData.profileData;
 			while (profile.size() > 0) {
@@ -152,7 +152,7 @@ public class DataDumpThread extends Thread {
 				sb.append('\t');
 				sb.append(cur.getRequestDesc().get("port"));
 				sb.append('\t');
-				sb.append(cur.getRequestDesc().get("cmd"));
+				sb.append(cur.getRequestDesc().get("db"));
 				sb.append('\t');
 				sb.append(cur.getRequestDesc().get("sql"));
 				sb.append('\t');
