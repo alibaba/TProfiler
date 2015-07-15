@@ -115,6 +115,11 @@ public class ProfConfig {
     private int port;
 
 	/**
+	 * 记录慢查询的时间；超过这个值的查询才会记录；如果设置为-1表示不启用慢日志记录
+	 */
+	private int recordTime;
+
+	/**
 	 * 构造方法
 	 */
 	public ProfConfig() {
@@ -226,6 +231,8 @@ public class ProfConfig {
     String excludeClassLoader = properties.getProperty("excludeClassLoader");
     String debugMode = properties.getProperty("debugMode");
     String port = properties.getProperty("port");
+	String recordTime = properties.getProperty("recordTime","-1");
+
     setPort(port == null ? 50000 : Integer.valueOf(port));
     setDebugMode("true".equalsIgnoreCase(debugMode == null ? null : debugMode.trim()));
     setExcludeClassLoader(excludeClassLoader);
@@ -253,6 +260,13 @@ public class ProfConfig {
     } else {
     	setSamplerIntervalTime(Integer.valueOf(samplerIntervalTime.trim()));
     }
+
+	if(recordTime==null){
+		setRecordTime(-1);
+	}else{
+		setRecordTime(Integer.valueOf(recordTime));
+	}
+
   }
 
 
@@ -462,4 +476,12 @@ public class ProfConfig {
     public void setPort(int port) {
         this.port = port;
     }
+
+	public int getRecordTime() {
+		return recordTime;
+	}
+
+	public void setRecordTime(int recordTime) {
+		this.recordTime = recordTime;
+	}
 }

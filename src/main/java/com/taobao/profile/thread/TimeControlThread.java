@@ -38,8 +38,7 @@ public class TimeControlThread extends Thread {
 	private InnerControlTime endTime;
 
 	/**
-	 * @param start
-	 * @param end
+	 * @param config
 	 */
 	public TimeControlThread(ProfConfig config) {
 		startTime = parse(config.getStartProfTime());
@@ -97,13 +96,7 @@ public class TimeControlThread extends Thread {
 		if (startTime == null || endTime == null) {
 			return;
 		}
-		try {
-			// delay 30s
-			TimeUnit.SECONDS.sleep(30);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
+		//取消30s的延迟
 		while (true) {
 			long time = waitTime(startTime);
 			if (time > 0) {

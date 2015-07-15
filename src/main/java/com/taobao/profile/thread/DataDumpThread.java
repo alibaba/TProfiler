@@ -8,11 +8,14 @@
  */
 package com.taobao.profile.thread;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import com.taobao.profile.Manager;
 import com.taobao.profile.Profiler;
 import com.taobao.profile.config.ProfConfig;
+import com.taobao.profile.dependence_query.RecordSlowQuery;
+import com.taobao.profile.dependence_query.SlowQueryData;
 import com.taobao.profile.runtime.ProfStack;
 import com.taobao.profile.runtime.ThreadData;
 import com.taobao.profile.utils.DailyRollingFileWriter;
@@ -28,6 +31,11 @@ public class DataDumpThread extends Thread {
 	 * log writer
 	 */
 	private DailyRollingFileWriter fileWriter;
+
+	/**
+	 * log mysql writer
+	 */
+	private DailyRollingFileWriter mysqlFileWriter;
 	/**
 	 * 默认profile时间(s)
 	 */
@@ -45,6 +53,8 @@ public class DataDumpThread extends Thread {
 	public DataDumpThread(ProfConfig config) {
 		// 读取用户配置
 		fileWriter = new DailyRollingFileWriter(config.getLogFilePath());
+		File temp = new File(config.getLogFilePath());
+		mysqlFileWriter = new DailyRollingFileWriter(temp.getParent()+"/mysqlProfiler.log");
 		eachProfUseTime = config.getEachProfUseTime();
 		eachProfIntervalTime = config.getEachProfIntervalTime();
 	}
@@ -65,6 +75,7 @@ public class DataDumpThread extends Thread {
 					TimeUnit.MILLISECONDS.sleep(500L);
 
 					dumpProfileData();
+					dumpMysqlData();
 				}
 				TimeUnit.SECONDS.sleep(eachProfIntervalTime);
 			}
@@ -120,5 +131,41 @@ public class DataDumpThread extends Thread {
 		}
 		fileWriter.append("=\n");
 		fileWriter.flushAppend();
+	}
+
+	/**
+	 * 记录Mysql方法的日志
+	 */
+	private void dumpMysqlData(){
+
+		SlowQueryData[] threadData = Profiler.slowQueryProfile;
+		for (int index = 0; index < threadData.length; index++) {
+			SlowQueryData profilerData = threadData[index];
+			if (profilerData == null) {
+				continue;
+			}
+			ProfStack<RecordSlowQuery> profile = profilerData.profileData;
+			while (profile.size() > 0) {
+				RecordSlowQuery cur = profile.pop();
+				StringBuilder sb = new StringBuilder();
+				sb.append(cur.getRequestDesc().get("host"));
+				sb.append('\t');
+				sb.append(cur.getRequestDesc().get("port"));
+				sb.append('\t');
+				sb.append(cur.getRequestDesc().get("cmd"));
+				sb.append('\t');
+				sb.append(cur.getRequestDesc().get("sql"));
+				sb.append('\t');
+				sb.append(cur.getRequestDesc().get("nanoTime"));
+				sb.append('\n');
+				mysqlFileWriter.append(sb.toString());
+				sb.setLength(0);
+			}
+			mysqlFileWriter.flushAppend();
+			profilerData.clear();
+		}
+		mysqlFileWriter.append("=\n");
+		mysqlFileWriter.flushAppend();
+
 	}
 }

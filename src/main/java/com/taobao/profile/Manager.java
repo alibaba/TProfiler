@@ -109,6 +109,11 @@ public class Manager {
 	private boolean isDebugMode;
 
 	/**
+	 * 记录慢查询的时间；超过这个值的查询才会记录；如果设置为-1表示不启用慢日志记录
+	 */
+	private static int recordTime;
+
+	/**
 	 * 私有构造器
 	 */
 	private Manager() {}
@@ -127,7 +132,7 @@ public class Manager {
 		moreThanEndTime = (now.compareTo(profConfig.getEndProfTime()) > 0 );
 		isDebugMode = profConfig.isDebugMode();
         PORT = profConfig.getPort();
-
+		recordTime = profConfig.getRecordTime();
 		setProfFilter();
 	}
 
@@ -217,6 +222,14 @@ public class Manager {
 	 */
 	public boolean isDebugMode() {
 		return isDebugMode;
+	}
+
+	public static int getRecordTime() {
+		return recordTime;
+	}
+
+	public static void setRecordTime(int recordTime) {
+		Manager.recordTime = recordTime;
 	}
 
 	/**
