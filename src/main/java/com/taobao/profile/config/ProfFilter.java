@@ -22,7 +22,7 @@ public class ProfFilter {
 	/**
 	 * 注入的Package集合
 	 */
-	private static Set<String> includePackage = new HashSet<String>();
+	protected static Set<String> includePackage = new HashSet<String>();
 	/**
 	 * 不注入的Package集合
 	 */
