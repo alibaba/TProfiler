@@ -106,7 +106,7 @@ public class DataDumpThread extends Thread {
 		for (int index = 0; index < threadData.length; index++) {
 			ThreadData profilerData = threadData[index];
 			if (profilerData == null) {
-		c		continue;
+				continue;
 			}
 			ProfStack<long[]> profile = profilerData.profileData;
 			while (profile.size() > 0) {
