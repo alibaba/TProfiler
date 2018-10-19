@@ -42,7 +42,7 @@ public class ProfTransformer implements ClassFileTransformer {
 	private byte[] transform4Mysql(ClassLoader loader, String className, Class<?> classBeingRedefined,
 								   ProtectionDomain protectionDomain, byte[] classfileBuffer){
 		try {
-			if(!MysqlProfFilter.getInstance().isNeedInject(className)){
+			if(!MysqlProfFilter.isNeedInjectMysql(className)){
 				return null;
 			}
 
